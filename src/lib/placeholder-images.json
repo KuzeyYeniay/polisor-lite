@@ -1,3 +1,40 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero",
+      "description": "A modern university building.",
+      "imageUrl": "https://picsum.photos/seed/hero/1200/800",
+      "imageHint": "university campus"
+    },
+    {
+      "id": "lesson1",
+      "description": "Students in a computer lab.",
+      "imageUrl": "https://picsum.photos/seed/lesson1/600/400",
+      "imageHint": "computer lab"
+    },
+    {
+      "id": "lesson2",
+      "description": "A lecture hall with students.",
+      "imageUrl": "https://picsum.photos/seed/lesson2/600/400",
+      "imageHint": "lecture hall"
+    },
+    {
+      "id": "lesson3",
+      "description": "An engineering workshop.",
+      "imageUrl": "https://picsum.photos/seed/lesson3/600/400",
+      "imageHint": "engineering workshop"
+    },
+    {
+      "id": "news1",
+      "description": "A group of students collaborating on a project.",
+      "imageUrl": "https://picsum.photos/seed/news1/600/400",
+      "imageHint": "students collaborating"
+    },
+    {
+      "id": "news2",
+      "description": "A robotics arm in a lab.",
+      "imageUrl": "https://picsum.photos/seed/news2/600/400",
+      "imageHint": "robotics lab"
+    }
+  ]
 }
