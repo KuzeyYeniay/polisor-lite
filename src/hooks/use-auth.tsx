@@ -15,11 +15,13 @@ import {
   updateProfile,
   User,
 } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import { useToast } from "./use-toast";
 
 interface AuthContextType {
   user: User | null;
+  enrolledCourses: string[];
   loading: boolean;
   signUp: (email: string, password: string, displayName: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
@@ -30,12 +32,25 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [enrolledCourses, setEnrolledCourses] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+      if (user) {
+        // Fetch user's enrolled courses from Firestore
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          setEnrolledCourses(userDoc.data().enrolledCourseIds || []);
+        } else {
+          setEnrolledCourses([]);
+        }
+      } else {
+        setEnrolledCourses([]);
+      }
       setLoading(false);
     });
     return () => unsubscribe();
@@ -48,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await updateProfile(userCredential.user, { displayName });
       // Manually update the user state because onAuthStateChanged might be slow
       setUser({ ...userCredential.user, displayName });
+      setEnrolledCourses([]); // New users have no courses yet
     } catch (error) {
       console.error("Sign up error:", error);
       throw error;
@@ -83,6 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = {
     user,
+    enrolledCourses,
     loading,
     signUp,
     signIn,

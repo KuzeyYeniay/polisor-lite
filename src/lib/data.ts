@@ -23,7 +23,6 @@ export const lessons: Lesson[] = [
     description: 'An introductory course to the fundamentals of computer science and programming.',
     teacher: 'Prof. Ada Lovelace',
     imageId: 'lesson1',
-    isLocked: false,
     calendar: [
       { day: 'Monday', time: '10:00 - 12:00', room: 'Room 1A' },
       { day: 'Wednesday', time: '14:00 - 16:00', room: 'Room 1A' },
@@ -35,7 +34,6 @@ export const lessons: Lesson[] = [
     description: 'Explore the principles of mechanics, materials, and energy.',
     teacher: 'Prof. James Watt',
     imageId: 'lesson2',
-    isLocked: false,
     calendar: [
       { day: 'Tuesday', time: '09:00 - 11:00', room: 'Lab 3B' },
       { day: 'Friday', time: '11:00 - 13:00', room: 'Lab 3B' },
@@ -47,7 +45,6 @@ export const lessons: Lesson[] = [
     description: 'Learn to design and analyze analog and digital electronic circuits.',
     teacher: 'Prof. Nikola Tesla',
     imageId: 'lesson3',
-    isLocked: true,
     calendar: [
       { day: 'Monday', time: '16:00 - 18:00', room: 'Elec. Lab 1' },
       { day: 'Thursday', time: '09:00 - 11:00', room: 'Elec. Lab 1' },
