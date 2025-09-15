@@ -23,11 +23,6 @@ const navItems = [
   { href: "/contact", label: "Contact", icon: <Phone /> },
 ];
 
-const authenticatedNavItems = [
-    ...navItems,
-    { href: "/dashboard/student", label: "Dashboard", icon: <LayoutDashboard /> },
-]
-
 export function Header() {
   const pathname = usePathname();
   const { user, signOut, loading } = useAuth();
@@ -36,9 +31,6 @@ export function Header() {
     if (!name) return 'U';
     return name.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase();
   };
-
-  const currentNavItems = user ? authenticatedNavItems : navItems;
-
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -49,7 +41,7 @@ export function Header() {
             <span className="font-bold">PoliSor Lite</span>
           </Link>
           <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-            {currentNavItems.map((item) => (
+            {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -84,6 +76,10 @@ export function Header() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                   <DropdownMenuItem onClick={() => window.location.href = '/dashboard/student'}>
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <span>Dashboard</span>
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={signOut}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
