@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { lessons, type TeacherMaterial } from '@/lib/data';
-import { PlusCircle, MoreVertical, Trash2, Edit } from 'lucide-react';
+import { PlusCircle, MoreVertical, Trash2, Edit, AlertTriangle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +25,9 @@ import { db, storage } from '@/lib/firebase';
 import { collection, addDoc, getDocs, onSnapshot } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/hooks/use-auth';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const uploadSchema = z.object({
   lessonId: z.string().min(1, 'Please select a lesson.'),
@@ -36,41 +39,52 @@ export default function TeacherDashboard() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const { user, role, loading: authLoading } = useAuth();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof uploadSchema>>({
     resolver: zodResolver(uploadSchema),
   });
 
   useEffect(() => {
-    setIsLoading(true);
-    const unsubscribe = onSnapshot(collection(db, 'materials'), (snapshot) => {
-      const materialsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TeacherMaterial));
-      setMaterials(materialsData);
-      setIsLoading(false);
-    }, (error) => {
-      console.error("Error fetching materials:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch materials.",
-        variant: "destructive",
-      });
-      setIsLoading(false);
-    });
+    if (!authLoading) {
+      if (!user) {
+        router.push('/auth');
+      } else if (role !== 'teacher') {
+        router.push('/dashboard/student');
+      }
+    }
+  }, [user, role, authLoading, router]);
 
-    return () => unsubscribe();
-  }, [toast]);
+  useEffect(() => {
+    if (role === 'teacher') {
+      setIsLoading(true);
+      const unsubscribe = onSnapshot(collection(db, 'materials'), (snapshot) => {
+        const materialsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TeacherMaterial));
+        setMaterials(materialsData);
+        setIsLoading(false);
+      }, (error) => {
+        console.error("Error fetching materials:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch materials.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+      });
+      return () => unsubscribe();
+    }
+  }, [role, toast]);
   
   const handleUpload = async (values: z.infer<typeof uploadSchema>) => {
     const file = values.file[0];
     if (!file) return;
 
     try {
-      // 1. Upload file to Firebase Storage
       const storageRef = ref(storage, `materials/${file.name}`);
       const uploadResult = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(uploadResult.ref);
 
-      // 2. Add material metadata to Firestore
       const lesson = lessons.find(l => l.id === values.lessonId);
       if (!lesson) {
         toast({ title: "Error", description: "Selected lesson not found.", variant: "destructive" });
@@ -95,6 +109,31 @@ export default function TeacherDashboard() {
       toast({ title: "Upload Failed", description: "An error occurred while uploading the file.", variant: "destructive" });
     }
   };
+
+  if (authLoading || role !== 'teacher') {
+    return (
+      <div className="container flex items-center justify-center min-h-[calc(100vh-10rem)]">
+        {authLoading ? (
+            <div className="w-full max-w-4xl space-y-8">
+                <Skeleton className="h-12 w-1/3" />
+                <Skeleton className="h-48 w-full" />
+            </div>
+        ) : (
+          <Card className="w-full max-w-md text-center">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-center gap-2"><AlertTriangle className="text-destructive h-6 w-6"/> Access Denied</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">You do not have permission to view this page. This area is for teachers only.</p>
+              <Button asChild className="mt-6">
+                <Link href="/dashboard/student">Go to Student Dashboard</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="container py-12">

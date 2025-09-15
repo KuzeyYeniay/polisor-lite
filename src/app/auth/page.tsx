@@ -33,7 +33,7 @@ const signupSchema = z.object({
 });
 
 export default function AuthPage() {
-  const { user, signUp, signIn, loading } = useAuth();
+  const { user, role, signUp, signIn, loading } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
 
@@ -49,15 +49,16 @@ export default function AuthPage() {
   
   useEffect(() => {
     if (user) {
-      router.push("/dashboard/student");
+      const destination = role === 'teacher' ? '/dashboard/teacher' : '/dashboard/student';
+      router.push(destination);
     }
-  }, [user, router]);
+  }, [user, role, router]);
 
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     try {
       await signIn(values.email, values.password);
       toast({ title: "Login Successful", description: "Welcome back!" });
-      router.push("/dashboard/student");
+      // The useEffect will handle the redirect
     } catch (error: any) {
       toast({
         title: "Login Failed",
@@ -71,7 +72,7 @@ export default function AuthPage() {
     try {
       await signUp(values.email, values.password, values.name);
       toast({ title: "Signup Successful", description: "Your account has been created." });
-       router.push("/dashboard/student");
+       // The useEffect will handle the redirect
     } catch (error: any) {
       toast({
         title: "Signup Failed",

@@ -16,11 +16,14 @@ import {
   User,
 } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useToast } from "./use-toast";
+
+type UserRole = "student" | "teacher";
 
 interface AuthContextType {
   user: User | null;
+  role: UserRole | null;
   enrolledCourses: string[];
   loading: boolean;
   signUp: (email: string, password: string, displayName: string) => Promise<void>;
@@ -32,6 +35,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [role, setRole] = useState<UserRole | null>(null);
   const [enrolledCourses, setEnrolledCourses] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -40,16 +44,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user) {
-        // Fetch user's enrolled courses from Firestore
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
         if (userDoc.exists()) {
-          setEnrolledCourses(userDoc.data().enrolledCourseIds || []);
+          const data = userDoc.data();
+          setEnrolledCourses(data.enrolledCourseIds || []);
+          setRole(data.role || "student");
         } else {
+          // If the user doc doesn't exist, create it with a default role
+          await setDoc(userDocRef, { role: "student", enrolledCourseIds: [] });
           setEnrolledCourses([]);
+          setRole("student");
         }
       } else {
         setEnrolledCourses([]);
+        setRole(null);
       }
       setLoading(false);
     });
@@ -61,9 +70,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName });
-      // Manually update the user state because onAuthStateChanged might be slow
+      // Create user document in Firestore
+      const userDocRef = doc(db, "users", userCredential.user.uid);
+      await setDoc(userDocRef, { role: "student", enrolledCourseIds: [] });
+      
       setUser({ ...userCredential.user, displayName });
-      setEnrolledCourses([]); // New users have no courses yet
+      setRole("student");
+      setEnrolledCourses([]);
     } catch (error) {
       console.error("Sign up error:", error);
       throw error;
@@ -99,6 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = {
     user,
+    role,
     enrolledCourses,
     loading,
     signUp,
