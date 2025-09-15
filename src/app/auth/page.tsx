@@ -48,17 +48,18 @@ export default function AuthPage() {
   });
   
   useEffect(() => {
-    if (user) {
+    // Wait for loading to finish and role to be determined
+    if (!loading && user && role) {
       const destination = role === 'teacher' ? '/dashboard/teacher' : '/dashboard/student';
       router.push(destination);
     }
-  }, [user, role, router]);
+  }, [user, role, loading, router]);
 
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     try {
       await signIn(values.email, values.password);
       toast({ title: "Login Successful", description: "Welcome back!" });
-      // The useEffect will handle the redirect
+      // The useEffect will handle the redirect once user and role are loaded
     } catch (error: any) {
       toast({
         title: "Login Failed",
@@ -72,7 +73,7 @@ export default function AuthPage() {
     try {
       await signUp(values.email, values.password, values.name);
       toast({ title: "Signup Successful", description: "Your account has been created." });
-       // The useEffect will handle the redirect
+       // The useEffect will handle the redirect once user and role are loaded
     } catch (error: any) {
       toast({
         title: "Signup Failed",
