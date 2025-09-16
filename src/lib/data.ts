@@ -4,7 +4,6 @@ export type Lesson = {
   description: string;
   teacher: string;
   imageId: string;
-  isLocked?: boolean;
   calendar: { day: string; time: string; room: string }[];
 };
 
@@ -81,6 +80,7 @@ export type TeacherMaterial = {
   fileName: string;
   fileType: string;
   uploadDate: string;
+  downloadURL?: string;
 };
 
 export const teacherMaterials: TeacherMaterial[] = [
