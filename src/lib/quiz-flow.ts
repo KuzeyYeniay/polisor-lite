@@ -1,43 +1,29 @@
 'use server';
 
 /**
- * @fileOverview A server-side flow to fetch random quiz questions from Firestore.
+ * @fileOverview A server-side flow to fetch random quiz questions from Firestore and check answers.
  *
- * - getQuizQuestions - A function that fetches a specified number of random questions for a given quiz.
- * - GetQuizQuestionsInput - The input type for the getQuizQuestions function.
+ * - getQuizQuestions - Fetches a specified number of random questions for a given quiz.
  * - QuizQuestion - The type for a single quiz question returned to the client (without the correct answer).
- * - checkQuizAnswers - A function that checks the user's answers and returns the score.
+ * - checkQuizAnswers - Checks the user's answers and returns the score.
  * - CheckQuizAnswersInput - The input type for the checkQuizAnswers function.
  * - CheckQuizAnswersOutput - The return type for the checkQuizAnswers function.
  */
 
 import {z} from 'zod';
 import {ai} from '@/ai/genkit';
-import * as admin from 'firebase-admin';
+import { getFirestore, collection, getDocs, doc } from 'firebase/firestore';
+import { app } from '@/lib/firebase';
 
-// Helper function to initialize Firebase Admin and get Firestore instance
-// This ensures initialization only happens once.
-function getFirestoreInstance() {
-  if (!admin.apps.length) {
-    try {
-      // Explicitly providing the project ID helps in environments where ADC
-      // might not be automatically configured.
-      admin.initializeApp({
-        projectId: process.env.GCLOUD_PROJECT || 'studio-5751693164-b0fd0'
-      });
-    } catch (e) {
-      console.error('Firebase admin initialization error', e);
-      throw new Error("Failed to initialize Firebase Admin SDK.");
-    }
-  }
-  return admin.firestore();
-}
-
-
-const GetQuizQuestionsInputSchema = z.object({
-  quizId: z.string().describe('The ID of the quiz (e.g., "circuit-design").'),
-  count: z.number().int().positive().describe('The number of random questions to fetch.'),
+// This is the full question format as stored in Firestore.
+const FirestoreQuizQuestionSchema = z.object({
+  id: z.string(),
+  questionText: z.string(),
+  options: z.array(z.string()),
+  correctAnswer: z.string(),
 });
+type FirestoreQuizQuestion = z.infer<typeof FirestoreQuizQuestionSchema>;
+
 
 // This is the question format that will be sent to the client.
 // Notice that `correctAnswer` is not included.
@@ -52,10 +38,25 @@ const UserAnswerSchema = z.object({
     answer: z.string(),
 });
 
+const GetQuizQuestionsInputSchema = z.object({
+  quizId: z.string().describe('The ID of the quiz (e.g., "circuit-design").'),
+  count: z.number().int().positive().describe('The number of random questions to fetch.'),
+});
+
+const CheckQuizAnswersInputSchema = z.object({
+    quizId: z.string(),
+    answers: z.array(UserAnswerSchema),
+});
+
+const CheckQuizAnswersOutputSchema = z.object({
+    score: z.number(),
+    total: z.number(),
+});
+
 export type GetQuizQuestionsInput = z.infer<typeof GetQuizQuestionsInputSchema>;
 export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
-export type CheckQuizAnswersInput = z.infer<z.ZodObject<{ quizId: z.ZodString; answers: z.ZodArray<typeof UserAnswerSchema, "many">; }, "strip", z.ZodTypeAny, { quizId: string; answers: { questionId: string; answer: string; }[]; }, { quizId: string; answers: { questionId: string; answer: string; }[]; }>>;
-export type CheckQuizAnswersOutput = z.infer<z.ZodObject<{ score: z.ZodNumber; total: z.ZodNumber; }, "strip", z.ZodTypeAny, { score: number; total: number; }, { score: number; total: number; }>>;
+export type CheckQuizAnswersInput = z.infer<typeof CheckQuizAnswersInputSchema>;
+export type CheckQuizAnswersOutput = z.infer<typeof CheckQuizAnswersOutputSchema>;
 
 
 export async function getQuizQuestions(input: GetQuizQuestionsInput): Promise<QuizQuestion[]> {
@@ -66,6 +67,25 @@ export async function checkQuizAnswers(input: CheckQuizAnswersInput): Promise<Ch
     return checkQuizAnswersFlow(input);
 }
 
+// Helper to fetch all questions securely on the server
+async function fetchAllQuestions(quizId: string): Promise<FirestoreQuizQuestion[]> {
+    const db = getFirestore(app);
+    const questionsRef = collection(db, 'quizzes', quizId, 'questions');
+    const snapshot = await getDocs(questionsRef);
+    if (snapshot.empty) {
+      return [];
+    }
+    return snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        questionText: data.questionText,
+        options: data.options,
+        correctAnswer: data.correctAnswer,
+      };
+    });
+}
+
 const getQuizQuestionsFlow = ai.defineFlow(
   {
     name: 'getQuizQuestionsFlow',
@@ -73,19 +93,12 @@ const getQuizQuestionsFlow = ai.defineFlow(
     outputSchema: z.array(QuizQuestionSchema),
   },
   async ({quizId, count}) => {
-    const db = getFirestoreInstance();
-    const questionsRef = db.collection('quizzes').doc(quizId).collection('questions');
-    const snapshot = await questionsRef.get();
+    const allQuestions = await fetchAllQuestions(quizId);
 
-    if (snapshot.empty) {
+    if (allQuestions.length === 0) {
       console.log('No questions found for this quiz.');
       return [];
     }
-
-    const allQuestions = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
 
     // Simple random shuffle and slice
     const shuffled = allQuestions.sort(() => 0.5 - Math.random());
@@ -103,30 +116,19 @@ const getQuizQuestionsFlow = ai.defineFlow(
 const checkQuizAnswersFlow = ai.defineFlow(
     {
         name: 'checkQuizAnswersFlow',
-        inputSchema: z.object({
-            quizId: z.string(),
-            answers: z.array(UserAnswerSchema),
-        }),
-        outputSchema: z.object({
-            score: z.number(),
-            total: z.number(),
-        }),
+        inputSchema: CheckQuizAnswersInputSchema,
+        outputSchema: CheckQuizAnswersOutputSchema,
     },
     async ({quizId, answers}) => {
-        const db = getFirestoreInstance();
-        const questionsRef = db.collection('quizzes').doc(quizId).collection('questions');
+        const allQuestions = await fetchAllQuestions(quizId);
+        const questionMap = new Map(allQuestions.map(q => [q.id, q]));
+
         let correctAnswersCount = 0;
 
-        // This is not the most efficient way for a very large number of answers,
-        // but for a 15-question quiz, it's perfectly fine.
-        // We fetch each question document individually to check the correct answer.
         for (const userAnswer of answers) {
-            const questionDoc = await questionsRef.doc(userAnswer.questionId).get();
-            if (questionDoc.exists) {
-                const questionData = questionDoc.data();
-                if (questionData?.correctAnswer === userAnswer.answer) {
-                    correctAnswersCount++;
-                }
+            const question = questionMap.get(userAnswer.questionId);
+            if (question && question.correctAnswer === userAnswer.answer) {
+                correctAnswersCount++;
             }
         }
 
