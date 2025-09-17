@@ -12,7 +12,7 @@
 
 import {z} from 'zod';
 import {ai} from '@/ai/genkit';
-import { getFirestore, collection, getDocs, doc } from 'firebase/firestore';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 
 // This is the full question format as stored in Firestore.

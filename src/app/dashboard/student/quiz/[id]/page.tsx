@@ -163,16 +163,16 @@ export default function QuizPage() {
   }
 
   const currentQuestion = questions[currentQuestionIndex];
-  const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
-
+  
   if (!currentQuestion) {
-    // This can happen briefly if questions are empty before loading is completely done with all side-effects.
     return (
        <div className="container flex items-center justify-center min-h-[calc(100vh-10rem)]">
          <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     )
   }
+  
+  const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
   return (
     <div className="container flex items-center justify-center min-h-[calc(100vh-10rem)]">
