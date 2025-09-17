@@ -20,7 +20,11 @@ import * as admin from 'firebase-admin';
 function getFirestoreInstance() {
   if (!admin.apps.length) {
     try {
-      admin.initializeApp();
+      // Explicitly providing the project ID helps in environments where ADC
+      // might not be automatically configured.
+      admin.initializeApp({
+        projectId: process.env.GCLOUD_PROJECT || 'studio-5751693164-b0fd0'
+      });
     } catch (e) {
       console.error('Firebase admin initialization error', e);
       throw new Error("Failed to initialize Firebase Admin SDK.");
