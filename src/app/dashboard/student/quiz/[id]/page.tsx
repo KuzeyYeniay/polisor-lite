@@ -230,6 +230,14 @@ export default function QuizPage() {
 
   const currentQuestion = questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+  
+  if (!currentQuestion) {
+     return (
+        <div className="container flex items-center justify-center min-h-[calc(100vh-10rem)]">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
+     )
+  }
 
   return (
     <div className="container flex items-center justify-center min-h-[calc(100vh-10rem)]">
