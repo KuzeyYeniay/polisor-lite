@@ -27,9 +27,9 @@ export default function ContactPage() {
   return (
     <div className="container py-12 md:py-24">
       <div className="text-center">
-        <h1 className="text-4xl font-bold tracking-tight">Get in Touch</h1>
+        <h1 className="text-4xl font-bold tracking-tight">İletişime Geçin</h1>
         <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
-          We're here to help. Contact us through any of the channels below.
+          Yardımcı olmak için buradayız. İletişim bilgilerimiz aracılığıyla bize ulaşın.
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 max-w-4xl mx-auto">

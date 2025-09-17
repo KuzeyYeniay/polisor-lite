@@ -43,16 +43,16 @@ export default function LessonDetailPage({ params }: { params: { id: string } })
         <div className="md:col-span-1">
             <Card>
                 <CardHeader>
-                    <CardTitle>Academic Calendar</CardTitle>
-                    <CardDescription>Weekly schedule for this lesson.</CardDescription>
+                    <CardTitle>Akademik Takvim</CardTitle>
+                    <CardDescription>Haftalık Takvim</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Table>
                         <TableHeader>
                         <TableRow>
-                            <TableHead>Day</TableHead>
-                            <TableHead>Time</TableHead>
-                            <TableHead>Room</TableHead>
+                            <TableHead>Gün</TableHead>
+                            <TableHead>Saat</TableHead>
+                            <TableHead>Platform</TableHead>
                         </TableRow>
                         </TableHeader>
                         <TableBody>

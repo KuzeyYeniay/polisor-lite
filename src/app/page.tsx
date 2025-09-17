@@ -27,14 +27,14 @@ export default function Home() {
           )}
           <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center p-4">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
-              Welcome to PoliSor Lite
+              PoliSor
             </h1>
             <p className="text-lg md:text-xl text-white/90 max-w-2xl mb-8 drop-shadow-md">
-              Your streamlined portal for academic life at Politecnico di Torino.
+            Akademik kariyerindeki verimi arttırman için özenle hazırlanmış ders materyallerin, çözümlü sınavların ve daha fazlası burada.
             </p>
             <Link href="/lessons">
               <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                Explore Lessons <ArrowRight className="ml-2 h-5 w-5" />
+                Derslere Göz at <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
           </div>
@@ -43,8 +43,8 @@ export default function Home() {
         {/* Featured Lessons Section */}
         <section className="py-12">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold tracking-tight">Featured Lessons</h2>
-            <p className="text-muted-foreground mt-2">Get started with our most popular courses.</p>
+            <h2 className="text-3xl font-bold tracking-tight">Derslerimiz</h2>
+            <p className="text-muted-foreground mt-2">Her biri alanında başarılı öğrenciler tarafından yönetilen çeşitli kurslarımızı keşfedin.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {lessons.slice(0, 3).map((lesson) => {
@@ -81,8 +81,8 @@ export default function Home() {
         {/* Latest News Section */}
         <section className="py-12">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold tracking-tight">Latest News</h2>
-            <p className="text-muted-foreground mt-2">Stay updated with the latest from campus.</p>
+            <h2 className="text-3xl font-bold tracking-tight">Eğitmenlerimiz</h2>
+            <p className="text-muted-foreground mt-2">Sizi başarıya ulaştıracak eğitmenlerimizle tanışın.</p>
           </div>
           <div className="space-y-6 max-w-3xl mx-auto">
             {news.slice(0, 2).map((article) => (
@@ -98,7 +98,7 @@ export default function Home() {
             <div className="text-center pt-4">
                 <Link href="/news">
                     <Button variant="link" className="text-primary">
-                        View all news <ArrowRight className="ml-2 h-4 w-4" />
+                        Eğitim Kadromuz <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                 </Link>
             </div>

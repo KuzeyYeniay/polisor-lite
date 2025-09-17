@@ -18,9 +18,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const navItems = [
-  { href: "/lessons", label: "Lessons", icon: <BookOpen /> },
-  { href: "/news", label: "News", icon: <Newspaper /> },
-  { href: "/contact", label: "Contact", icon: <Phone /> },
+  { href: "/lessons", label: "Dersler", icon: <BookOpen /> },
+  { href: "/news", label: "Eğitmenler", icon: <Newspaper /> },
+  { href: "/contact", label: "İletişim", icon: <Phone /> },
 ];
 
 export function Header() {
@@ -38,7 +38,7 @@ export function Header() {
         <div className="mr-4 flex items-center">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <Icons.logo className="h-6 w-6 text-primary" />
-            <span className="font-bold">PoliSor Lite</span>
+            <span className="font-bold">PoliSor</span>
           </Link>
           <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
             {navItems.map((item) => (
@@ -78,11 +78,11 @@ export function Header() {
                   <DropdownMenuSeparator />
                    <DropdownMenuItem onClick={() => window.location.href = '/dashboard/student'}>
                     <LayoutDashboard className="mr-2 h-4 w-4" />
-                    <span>Dashboard</span>
+                    <span>Öğrenci Paneli</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={signOut}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
+                    <span>Çıkış Yap</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -90,7 +90,7 @@ export function Header() {
               <Link href="/auth">
                 <Button variant="outline" className="text-primary border-primary hover:bg-primary/10">
                   <User className="mr-2 h-4 w-4" />
-                  Login
+                  Giriş Yap
                 </Button>
               </Link>
             )}

@@ -10,8 +10,8 @@ export default function LessonsPage() {
   return (
     <div className="container py-12">
       <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold tracking-tight">All Lessons</h1>
-        <p className="text-muted-foreground mt-2">Browse our full catalog of courses.</p>
+        <h1 className="text-4xl font-bold tracking-tight">Derslerimiz</h1>
+        <p className="text-muted-foreground mt-2">Sizi sınavlara eksiksiz hazırlayan kurslarımızı keşfedin.</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {lessons.map((lesson) => {

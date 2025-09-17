@@ -87,15 +87,15 @@ export default function AuthPage() {
     <div className="container flex min-h-[calc(100vh-10rem)] items-center justify-center py-12">
       <Tabs defaultValue="login" className="w-[400px]">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="login">Login</TabsTrigger>
-          <TabsTrigger value="signup">Sign Up</TabsTrigger>
+          <TabsTrigger value="login">Giriş Yap</TabsTrigger>
+          <TabsTrigger value="signup">Kayıt Ol</TabsTrigger>
         </TabsList>
         <TabsContent value="login">
           <Card>
             <CardHeader className="text-center">
               <CardTitle className="flex justify-center items-center gap-2"> <Icons.logo className="h-6 w-6 text-primary"/> Welcome Back</CardTitle>
               <CardDescription>
-                Enter your credentials to access your dashboard.
+                Panele ulaşmak için bilgilerinizi girin
               </CardDescription>
             </CardHeader>
             <Form {...loginForm}>
@@ -119,7 +119,7 @@ export default function AuthPage() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel>Sifre</FormLabel>
                         <FormControl>
                           <Input type="password" {...field} />
                         </FormControl>
@@ -142,7 +142,7 @@ export default function AuthPage() {
             <CardHeader className="text-center">
               <CardTitle className="flex justify-center items-center gap-2"><Icons.logo className="h-6 w-6 text-primary"/> Create an Account</CardTitle>
               <CardDescription>
-                Join the PoliSor Lite community.
+                PoliSor'a Katılın
               </CardDescription>
             </CardHeader>
              <Form {...signupForm}>
@@ -153,7 +153,7 @@ export default function AuthPage() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Full Name</FormLabel>
+                        <FormLabel>Ad Soyad</FormLabel>
                         <FormControl>
                           <Input placeholder="Mario Rossi" {...field} />
                         </FormControl>
@@ -179,7 +179,7 @@ export default function AuthPage() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel>Sifre</FormLabel>
                         <FormControl>
                           <Input type="password" {...field} />
                         </FormControl>
