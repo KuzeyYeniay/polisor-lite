@@ -22,6 +22,7 @@ type FirestoreQuizQuestion = {
 };
 
 // This is the question format that will be used in the component state.
+// It includes the question text.
 type QuizQuestion = {
   id: string;
   questionText: string;
@@ -40,7 +41,7 @@ export default function QuizPage() {
   const { toast } = useToast();
 
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
-  const [allQuestions, setAllQuestions] = useState<FirestoreQuizQuestion[]>([]);
+  const [allQuestionsWithAnswers, setAllQuestionsWithAnswers] = useState<FirestoreQuizQuestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -76,9 +77,10 @@ export default function QuizPage() {
         const shuffled = fetchedQuestions.sort(() => 0.5 - Math.random());
         const selectedQuestions = shuffled.slice(0, 15);
         
-        setAllQuestions(selectedQuestions); // Store full questions for later checking
+        // Store the full questions with answers for grading later
+        setAllQuestionsWithAnswers(selectedQuestions);
 
-        // Strip correct answers before setting client-side state
+        // Create a version of the questions for the client without the correct answer
         const questionsForClient: QuizQuestion[] = selectedQuestions.map(q => ({
             id: q.id,
             questionText: q.questionText,
@@ -91,7 +93,7 @@ export default function QuizPage() {
         console.error('Failed to fetch quiz questions:', error);
         toast({
           title: 'Error Loading Quiz',
-          description: 'There was an issue loading the questions. Please check your connection and try again.',
+          description: 'There was an issue loading the questions. Please try again.',
           variant: 'destructive',
         });
       } finally {
@@ -112,19 +114,18 @@ export default function QuizPage() {
       answer: selectedOption,
     };
 
-    setUserAnswers(prev => {
-        const otherAnswers = prev.filter(a => a.questionId !== newAnswer.questionId);
-        return [...otherAnswers, newAnswer];
-    });
+    const updatedAnswers = userAnswers.filter(a => a.questionId !== newAnswer.questionId);
+    updatedAnswers.push(newAnswer);
+    setUserAnswers(updatedAnswers);
 
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
       const nextQuestionId = questions[currentQuestionIndex + 1].id;
-      const previouslySelected = userAnswers.find(a => a.questionId === nextQuestionId)?.answer ?? null;
+      const previouslySelected = updatedAnswers.find(a => a.questionId === nextQuestionId)?.answer ?? null;
       setSelectedOption(previouslySelected);
     } else {
       // At the last question, submit
-      handleSubmit([...userAnswers.filter(a => a.questionId !== newAnswer.questionId), newAnswer]);
+      handleSubmit(updatedAnswers);
     }
   };
 
@@ -140,7 +141,7 @@ export default function QuizPage() {
   const handleSubmit = (finalAnswers: UserAnswer[]) => {
       setIsSubmitting(true);
       
-      const questionMap = new Map(allQuestions.map(q => [q.id, q]));
+      const questionMap = new Map(allQuestionsWithAnswers.map(q => [q.id, q]));
       let correctAnswersCount = 0;
 
       for (const userAnswer of finalAnswers) {
