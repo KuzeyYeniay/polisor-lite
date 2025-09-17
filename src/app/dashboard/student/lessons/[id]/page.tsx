@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Download, FileText, AlertTriangle, BookOpen } from 'lucide-react';
+import { Download, FileText, AlertTriangle, BookOpen, BrainCircuit } from 'lucide-react';
 import Link from 'next/link';
 
 export default function StudentLessonPortal() {
@@ -70,6 +70,11 @@ export default function StudentLessonPortal() {
             </div>
           </CardContent>
         </Card>
+         {id === 'circuit-design' && (
+          <div className="mt-8">
+            <Skeleton className="h-20 w-full" />
+          </div>
+        )}
       </div>
     );
   }
@@ -152,6 +157,24 @@ export default function StudentLessonPortal() {
             </Table>
         </CardContent>
       </Card>
+
+      {id === 'circuit-design' && (
+        <Card className="mt-8">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <BrainCircuit className="w-6 h-6 text-primary"/>
+                    Test Your Knowledge
+                </CardTitle>
+                <CardDescription>Take a practice quiz to check your understanding of the material.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <p className="text-muted-foreground mb-4">You'll be presented with 15 random questions from the question bank. Good luck!</p>
+                <Button asChild>
+                    <Link href={`/dashboard/student/quiz/${id}`}>Start Quiz</Link>
+                </Button>
+            </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

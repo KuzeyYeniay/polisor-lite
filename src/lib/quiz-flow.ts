@@ -6,6 +6,9 @@
  * - getQuizQuestions - A function that fetches a specified number of random questions for a given quiz.
  * - GetQuizQuestionsInput - The input type for the getQuizQuestions function.
  * - QuizQuestion - The type for a single quiz question returned to the client (without the correct answer).
+ * - checkQuizAnswers - A function that checks the user's answers and returns the score.
+ * - CheckQuizAnswersInput - The input type for the checkQuizAnswers function.
+ * - CheckQuizAnswersOutput - The return type for the checkQuizAnswers function.
  */
 
 import {z} from 'zod';
@@ -14,10 +17,14 @@ import * as admin from 'firebase-admin';
 
 // Initialize Firebase Admin SDK if not already initialized
 if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.applicationDefault(),
-    databaseURL: `https://${process.env.GCLOUD_PROJECT}.firebaseio.com`,
-  });
+  try {
+    admin.initializeApp({
+      credential: admin.credential.applicationDefault(),
+      databaseURL: `https://${process.env.GCLOUD_PROJECT}.firebaseio.com`,
+    });
+  } catch (e) {
+    console.error('Firebase admin initialization error', e);
+  }
 }
 
 const db = admin.firestore();
@@ -35,11 +42,34 @@ const QuizQuestionSchema = z.object({
   options: z.array(z.string()),
 });
 
+const UserAnswerSchema = z.object({
+    questionId: z.string(),
+    answer: z.string(),
+});
+
+export const CheckQuizAnswersInputSchema = z.object({
+    quizId: z.string(),
+    answers: z.array(UserAnswerSchema),
+});
+
+export const CheckQuizAnswersOutputSchema = z.object({
+    score: z.number(),
+    total: z.number(),
+});
+
+
 export type GetQuizQuestionsInput = z.infer<typeof GetQuizQuestionsInputSchema>;
 export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
+export type CheckQuizAnswersInput = z.infer<typeof CheckQuizAnswersInputSchema>;
+export type CheckQuizAnswersOutput = z.infer<typeof CheckQuizAnswersOutputSchema>;
+
 
 export async function getQuizQuestions(input: GetQuizQuestionsInput): Promise<QuizQuestion[]> {
   return getQuizQuestionsFlow(input);
+}
+
+export async function checkQuizAnswers(input: CheckQuizAnswersInput): Promise<CheckQuizAnswersOutput> {
+    return checkQuizAnswersFlow(input);
 }
 
 const getQuizQuestionsFlow = ai.defineFlow(
@@ -73,4 +103,34 @@ const getQuizQuestionsFlow = ai.defineFlow(
       options: q.options,
     }));
   }
+);
+
+const checkQuizAnswersFlow = ai.defineFlow(
+    {
+        name: 'checkQuizAnswersFlow',
+        inputSchema: CheckQuizAnswersInputSchema,
+        outputSchema: CheckQuizAnswersOutputSchema,
+    },
+    async ({quizId, answers}) => {
+        const questionsRef = db.collection('quizzes').doc(quizId).collection('questions');
+        let correctAnswersCount = 0;
+
+        // This is not the most efficient way for a very large number of answers,
+        // but for a 15-question quiz, it's perfectly fine.
+        // We fetch each question document individually to check the correct answer.
+        for (const userAnswer of answers) {
+            const questionDoc = await questionsRef.doc(userAnswer.questionId).get();
+            if (questionDoc.exists) {
+                const questionData = questionDoc.data();
+                if (questionData?.correctAnswer === userAnswer.answer) {
+                    correctAnswersCount++;
+                }
+            }
+        }
+
+        return {
+            score: correctAnswersCount,
+            total: answers.length,
+        };
+    }
 );
