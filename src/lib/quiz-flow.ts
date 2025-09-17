@@ -15,22 +15,18 @@ import {z} from 'zod';
 import {ai} from '@/ai/genkit';
 import * as admin from 'firebase-admin';
 
-// Initialize Firebase Admin SDK if not already initialized
-if (!admin.apps.length) {
-  try {
-    admin.initializeApp();
-  } catch (e) {
-    console.error('Firebase admin initialization error', e);
+// Helper function to initialize Firebase Admin and get Firestore instance
+// This ensures initialization only happens once.
+function getFirestoreInstance() {
+  if (!admin.apps.length) {
+    try {
+      admin.initializeApp();
+    } catch (e) {
+      console.error('Firebase admin initialization error', e);
+      throw new Error("Failed to initialize Firebase Admin SDK.");
+    }
   }
-}
-
-let db: admin.firestore.Firestore;
-try {
-  db = admin.firestore();
-} catch (e) {
-  console.error('Firestore initialization error', e);
-  // In a real app, you might want to handle this more gracefully.
-  // For now, this will cause subsequent operations to fail, which will be caught.
+  return admin.firestore();
 }
 
 
@@ -73,9 +69,7 @@ const getQuizQuestionsFlow = ai.defineFlow(
     outputSchema: z.array(QuizQuestionSchema),
   },
   async ({quizId, count}) => {
-    if (!db) {
-        throw new Error("Firestore is not initialized.");
-    }
+    const db = getFirestoreInstance();
     const questionsRef = db.collection('quizzes').doc(quizId).collection('questions');
     const snapshot = await questionsRef.get();
 
@@ -115,9 +109,7 @@ const checkQuizAnswersFlow = ai.defineFlow(
         }),
     },
     async ({quizId, answers}) => {
-         if (!db) {
-            throw new Error("Firestore is not initialized.");
-        }
+        const db = getFirestoreInstance();
         const questionsRef = db.collection('quizzes').doc(quizId).collection('questions');
         let correctAnswersCount = 0;
 
