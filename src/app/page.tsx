@@ -3,12 +3,24 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ArrowRight, BookOpen } from 'lucide-react';
-import { lessons, news } from '@/lib/data';
+import { lessons } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Chatbot } from '@/components/chatbot';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function Home() {
   const heroImage = PlaceHolderImages.find(p => p.id === 'hero');
+
+  // Create a unique list of teachers
+  const teachers = lessons.reduce((acc, lesson) => {
+    if (!acc.some(teacher => teacher.name === lesson.teacher)) {
+      acc.push({
+        name: lesson.teacher,
+        imageId: lesson.teacherImageId,
+      });
+    }
+    return acc;
+  }, [] as { name: string; imageId: string }[]);
 
   return (
     <>
@@ -78,31 +90,35 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Latest News Section */}
+        {/* Instructors Section */}
         <section className="py-12">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold tracking-tight">Eğitmenlerimiz</h2>
             <p className="text-muted-foreground mt-2">Sizi başarıya ulaştıracak eğitmenlerimizle tanışın.</p>
           </div>
-          <div className="space-y-6 max-w-3xl mx-auto">
-            {news.slice(0, 2).map((article) => (
-              <Card key={article.id} className="p-4">
-                 <div>
-                  <Link href={`/news`}>
-                    <h3 className="text-lg font-semibold hover:text-primary transition-colors">{article.title}</h3>
-                  </Link>
-                  <p className="text-muted-foreground text-sm mt-1">{article.summary}</p>
-                </div>
-              </Card>
-            ))}
-            <div className="text-center pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {teachers.map((teacher) => {
+                const teacherImage = PlaceHolderImages.find(p => p.id === teacher.imageId);
+                return (
+                    <Card key={teacher.name} className="text-center flex flex-col items-center p-6 transition-transform hover:scale-105 hover:shadow-lg">
+                        <Avatar className="w-32 h-32 mb-4 border-4 border-primary">
+                             {teacherImage && <AvatarImage src={teacherImage.imageUrl} alt={teacher.name} data-ai-hint={teacherImage.imageHint} />}
+                             <AvatarFallback>{teacher.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <CardHeader className="p-0">
+                            <CardTitle className="text-xl">{teacher.name}</CardTitle>
+                        </CardHeader>
+                    </Card>
+                )
+            })}
+          </div>
+           <div className="text-center pt-8">
                 <Link href="/news">
                     <Button variant="link" className="text-primary">
-                        Eğitim Kadromuz <ArrowRight className="ml-2 h-4 w-4" />
+                        Tüm Eğitim Kadromuz <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                 </Link>
             </div>
-          </div>
         </section>
       </div>
       <Chatbot />

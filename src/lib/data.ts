@@ -3,6 +3,7 @@ export type Lesson = {
   title: string;
   description: string;
   teacher: string;
+  teacherImageId: string;
   imageId: string;
   calendar: { day: string; time: string; room: string }[];
 };
@@ -21,6 +22,7 @@ export const lessons: Lesson[] = [
     title: 'Computer Science 101',
     description: 'An introductory course to the fundamentals of computer science and programming.',
     teacher: 'Prof. Ada Lovelace',
+    teacherImageId: 'teacher1',
     imageId: 'lesson1',
     calendar: [
       { day: 'Monday', time: '10:00 - 12:00', room: 'Room 1A' },
@@ -32,6 +34,7 @@ export const lessons: Lesson[] = [
     title: 'Mechanical Engineering',
     description: 'Explore the principles of mechanics, materials, and energy.',
     teacher: 'Prof. James Watt',
+    teacherImageId: 'teacher2',
     imageId: 'lesson2',
     calendar: [
       { day: 'Tuesday', time: '09:00 - 11:00', room: 'Lab 3B' },
@@ -43,6 +46,7 @@ export const lessons: Lesson[] = [
     title: 'Circuit Design & Analysis',
     description: 'Learn to design and analyze analog and digital electronic circuits.',
     teacher: 'Prof. Nikola Tesla',
+    teacherImageId: 'teacher3',
     imageId: 'lesson3',
     calendar: [
       { day: 'Monday', time: '16:00 - 18:00', room: 'Elec. Lab 1' },

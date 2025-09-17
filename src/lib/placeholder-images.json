@@ -35,6 +35,24 @@
       "description": "A robotics arm in a lab.",
       "imageUrl": "https://picsum.photos/seed/news2/600/400",
       "imageHint": "robotics lab"
+    },
+    {
+      "id": "teacher1",
+      "description": "Portrait of Ada Lovelace",
+      "imageUrl": "https://picsum.photos/seed/teacher1/400/400",
+      "imageHint": "portrait woman"
+    },
+    {
+      "id": "teacher2",
+      "description": "Portrait of James Watt",
+      "imageUrl": "https://picsum.photos/seed/teacher2/400/400",
+      "imageHint": "portrait man"
+    },
+    {
+      "id": "teacher3",
+      "description": "Portrait of Nikola Tesla",
+      "imageUrl": "https://picsum.photos/seed/teacher3/400/400",
+      "imageHint": "portrait man"
     }
   ]
 }
