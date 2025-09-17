@@ -52,21 +52,10 @@ const UserAnswerSchema = z.object({
     answer: z.string(),
 });
 
-export const CheckQuizAnswersInputSchema = z.object({
-    quizId: z.string(),
-    answers: z.array(UserAnswerSchema),
-});
-
-export const CheckQuizAnswersOutputSchema = z.object({
-    score: z.number(),
-    total: z.number(),
-});
-
-
 export type GetQuizQuestionsInput = z.infer<typeof GetQuizQuestionsInputSchema>;
 export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
-export type CheckQuizAnswersInput = z.infer<typeof CheckQuizAnswersInputSchema>;
-export type CheckQuizAnswersOutput = z.infer<typeof CheckQuizAnswersOutputSchema>;
+export type CheckQuizAnswersInput = z.infer<z.ZodObject<{ quizId: z.ZodString; answers: z.ZodArray<typeof UserAnswerSchema, "many">; }, "strip", z.ZodTypeAny, { quizId: string; answers: { questionId: string; answer: string; }[]; }, { quizId: string; answers: { questionId: string; answer: string; }[]; }>>;
+export type CheckQuizAnswersOutput = z.infer<z.ZodObject<{ score: z.ZodNumber; total: z.ZodNumber; }, "strip", z.ZodTypeAny, { score: number; total: number; }, { score: number; total: number; }>>;
 
 
 export async function getQuizQuestions(input: GetQuizQuestionsInput): Promise<QuizQuestion[]> {
@@ -116,8 +105,14 @@ const getQuizQuestionsFlow = ai.defineFlow(
 const checkQuizAnswersFlow = ai.defineFlow(
     {
         name: 'checkQuizAnswersFlow',
-        inputSchema: CheckQuizAnswersInputSchema,
-        outputSchema: CheckQuizAnswersOutputSchema,
+        inputSchema: z.object({
+            quizId: z.string(),
+            answers: z.array(UserAnswerSchema),
+        }),
+        outputSchema: z.object({
+            score: z.number(),
+            total: z.number(),
+        }),
     },
     async ({quizId, answers}) => {
          if (!db) {
