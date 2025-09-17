@@ -13,7 +13,7 @@
 
 import {z} from 'zod';
 import {ai} from '@/ai/genkit';
-import *s as admin from 'firebase-admin';
+import * as admin from 'firebase-admin';
 
 // Initialize Firebase Admin SDK if not already initialized
 if (!admin.apps.length) {
