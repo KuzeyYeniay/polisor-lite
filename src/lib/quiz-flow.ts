@@ -13,21 +13,26 @@
 
 import {z} from 'zod';
 import {ai} from '@/ai/genkit';
-import * as admin from 'firebase-admin';
+import *s as admin from 'firebase-admin';
 
 // Initialize Firebase Admin SDK if not already initialized
 if (!admin.apps.length) {
   try {
-    admin.initializeApp({
-      credential: admin.credential.applicationDefault(),
-      databaseURL: `https://${process.env.GCLOUD_PROJECT}.firebaseio.com`,
-    });
+    admin.initializeApp();
   } catch (e) {
     console.error('Firebase admin initialization error', e);
   }
 }
 
-const db = admin.firestore();
+let db: admin.firestore.Firestore;
+try {
+  db = admin.firestore();
+} catch (e) {
+  console.error('Firestore initialization error', e);
+  // In a real app, you might want to handle this more gracefully.
+  // For now, this will cause subsequent operations to fail, which will be caught.
+}
+
 
 const GetQuizQuestionsInputSchema = z.object({
   quizId: z.string().describe('The ID of the quiz (e.g., "circuit-design").'),
@@ -79,6 +84,9 @@ const getQuizQuestionsFlow = ai.defineFlow(
     outputSchema: z.array(QuizQuestionSchema),
   },
   async ({quizId, count}) => {
+    if (!db) {
+        throw new Error("Firestore is not initialized.");
+    }
     const questionsRef = db.collection('quizzes').doc(quizId).collection('questions');
     const snapshot = await questionsRef.get();
 
@@ -112,6 +120,9 @@ const checkQuizAnswersFlow = ai.defineFlow(
         outputSchema: CheckQuizAnswersOutputSchema,
     },
     async ({quizId, answers}) => {
+         if (!db) {
+            throw new Error("Firestore is not initialized.");
+        }
         const questionsRef = db.collection('quizzes').doc(quizId).collection('questions');
         let correctAnswersCount = 0;
 
