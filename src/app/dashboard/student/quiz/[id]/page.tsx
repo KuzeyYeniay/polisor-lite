@@ -181,7 +181,7 @@ export default function QuizPage() {
       </div>
     );
   }
-
+  
   if (quizFinished && score !== null) {
      const percentage = Math.round((score.score / score.total) * 100);
      const isPass = percentage >= 60;
@@ -220,7 +220,7 @@ export default function QuizPage() {
             <CardContent>
                 <p className="text-muted-foreground">Could not load quiz questions. Please try again later.</p>
                 <Button asChild className="mt-6" variant="outline" onClick={() => router.back()}>
-                    Go Back
+                    <p>Go Back</p>
                 </Button>
             </CardContent>
          </Card>
