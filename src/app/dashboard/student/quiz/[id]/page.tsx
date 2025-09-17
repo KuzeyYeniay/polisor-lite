@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { getQuizQuestions, checkQuizAnswers, type QuizQuestion } from '@/lib/quiz-flow';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -11,6 +10,23 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { AlertTriangle, CheckCircle, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { db } from '@/lib/firebase';
+import { collection, getDocs } from 'firebase/firestore';
+
+// This is the full question format as stored in Firestore.
+type FirestoreQuizQuestion = {
+  id: string;
+  questionText: string;
+  options: string[];
+  correctAnswer: string;
+};
+
+// This is the question format that will be used in the component state.
+type QuizQuestion = {
+  id: string;
+  questionText: string;
+  options: string[];
+};
 
 type UserAnswer = {
   questionId: string;
@@ -24,6 +40,7 @@ export default function QuizPage() {
   const { toast } = useToast();
 
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [allQuestions, setAllQuestions] = useState<FirestoreQuizQuestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -37,9 +54,11 @@ export default function QuizPage() {
       if (typeof quizId !== 'string') return;
       try {
         setIsLoading(true);
-        const fetchedQuestions = await getQuizQuestions({ quizId, count: 15 });
-        if (fetchedQuestions.length === 0) {
-           toast({
+        const questionsRef = collection(db, 'quizzes', quizId, 'questions');
+        const snapshot = await getDocs(questionsRef);
+
+        if (snapshot.empty) {
+          toast({
             title: 'No Questions Found',
             description: 'Could not find any questions for this quiz.',
             variant: 'destructive',
@@ -47,12 +66,32 @@ export default function QuizPage() {
           router.back();
           return;
         }
-        setQuestions(fetchedQuestions);
+
+        const fetchedQuestions: FirestoreQuizQuestion[] = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+        } as FirestoreQuizQuestion));
+
+        // Simple random shuffle and slice
+        const shuffled = fetchedQuestions.sort(() => 0.5 - Math.random());
+        const selectedQuestions = shuffled.slice(0, 15);
+        
+        setAllQuestions(selectedQuestions); // Store full questions for later checking
+
+        // Strip correct answers before setting client-side state
+        const questionsForClient: QuizQuestion[] = selectedQuestions.map(q => ({
+            id: q.id,
+            questionText: q.questionText,
+            options: q.options,
+        }));
+        
+        setQuestions(questionsForClient);
+
       } catch (error) {
         console.error('Failed to fetch quiz questions:', error);
         toast({
-          title: 'Error',
-          description: 'Failed to load the quiz. Please try again.',
+          title: 'Error Loading Quiz',
+          description: 'There was an issue loading the questions. Please check your connection and try again.',
           variant: 'destructive',
         });
       } finally {
@@ -80,37 +119,44 @@ export default function QuizPage() {
 
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
-      setSelectedOption(userAnswers.find(a => a.questionId === questions[currentQuestionIndex + 1].id)?.answer ?? null);
+      const nextQuestionId = questions[currentQuestionIndex + 1].id;
+      const previouslySelected = userAnswers.find(a => a.questionId === nextQuestionId)?.answer ?? null;
+      setSelectedOption(previouslySelected);
     } else {
-      // At the last question, prepare for submission
-      handleSubmit([...userAnswers, newAnswer]);
+      // At the last question, submit
+      handleSubmit([...userAnswers.filter(a => a.questionId !== newAnswer.questionId), newAnswer]);
     }
   };
 
   const handleBack = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prev => prev - 1);
-       setSelectedOption(userAnswers.find(a => a.questionId === questions[currentQuestionIndex - 1].id)?.answer ?? null);
+       const prevQuestionId = questions[currentQuestionIndex - 1].id;
+       const previouslySelected = userAnswers.find(a => a.questionId === prevQuestionId)?.answer ?? null;
+       setSelectedOption(previouslySelected);
     }
   };
   
-  const handleSubmit = async (finalAnswers: UserAnswer[]) => {
+  const handleSubmit = (finalAnswers: UserAnswer[]) => {
       setIsSubmitting(true);
-      try {
-        if(typeof quizId !== 'string') return;
-        const result = await checkQuizAnswers({ quizId, answers: finalAnswers });
-        setScore(result);
-        setQuizFinished(true);
-      } catch (error) {
-         console.error('Failed to submit quiz:', error);
-        toast({
-          title: 'Submission Failed',
-          description: 'Could not submit your answers. Please try again.',
-          variant: 'destructive',
-        });
-      } finally {
-          setIsSubmitting(false);
+      
+      const questionMap = new Map(allQuestions.map(q => [q.id, q]));
+      let correctAnswersCount = 0;
+
+      for (const userAnswer of finalAnswers) {
+          const question = questionMap.get(userAnswer.questionId);
+          if (question && question.correctAnswer === userAnswer.answer) {
+              correctAnswersCount++;
+          }
       }
+
+      setScore({
+          score: correctAnswersCount,
+          total: finalAnswers.length,
+      });
+
+      setQuizFinished(true);
+      setIsSubmitting(false);
   }
 
   if (isLoading) {
@@ -161,17 +207,28 @@ export default function QuizPage() {
         </div>
     )
   }
-
-  const currentQuestion = questions[currentQuestionIndex];
   
-  if (!currentQuestion) {
-    return (
+  if (questions.length === 0 && !isLoading) {
+     return (
        <div className="container flex items-center justify-center min-h-[calc(100vh-10rem)]">
-         <Loader2 className="h-8 w-8 animate-spin text-primary" />
+         <Card className="w-full max-w-md text-center">
+            <CardHeader>
+                <CardTitle className="flex items-center justify-center gap-2">
+                    <AlertTriangle className="text-destructive h-6 w-6"/> Error
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p className="text-muted-foreground">Could not load quiz questions. Please try again later.</p>
+                <Button asChild className="mt-6" variant="outline" onClick={() => router.back()}>
+                    Go Back
+                </Button>
+            </CardContent>
+         </Card>
       </div>
     )
   }
-  
+
+  const currentQuestion = questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
   return (
@@ -185,7 +242,7 @@ export default function QuizPage() {
         <CardContent>
           <RadioGroup value={selectedOption ?? undefined} onValueChange={setSelectedOption} className="space-y-4">
             {currentQuestion.options.map((option, index) => (
-                <Label key={index} className="flex items-center space-x-3 p-4 border rounded-md has-[:checked]:bg-muted has-[:checked]:border-primary transition-all">
+                <Label key={index} className="flex items-center space-x-3 p-4 border rounded-md has-[:checked]:bg-muted has-[:checked]:border-primary transition-all cursor-pointer">
                     <RadioGroupItem value={option} id={`option-${index}`} />
                     <span>{option}</span>
                 </Label>
