@@ -67,15 +67,23 @@ export async function checkQuizAnswers(input: CheckQuizAnswersInput): Promise<Ch
     return checkQuizAnswersFlow(input);
 }
 
-// Helper to fetch all questions securely on the server
-async function fetchAllQuestions(quizId: string): Promise<FirestoreQuizQuestion[]> {
+const getQuizQuestionsFlow = ai.defineFlow(
+  {
+    name: 'getQuizQuestionsFlow',
+    inputSchema: GetQuizQuestionsInputSchema,
+    outputSchema: z.array(QuizQuestionSchema),
+  },
+  async ({quizId, count}) => {
     const db = getFirestore(app);
     const questionsRef = collection(db, 'quizzes', quizId, 'questions');
     const snapshot = await getDocs(questionsRef);
+    
     if (snapshot.empty) {
+      console.log('No questions found for this quiz.');
       return [];
     }
-    return snapshot.docs.map(doc => {
+
+    const allQuestions: FirestoreQuizQuestion[] = snapshot.docs.map(doc => {
       const data = doc.data();
       return {
         id: doc.id,
@@ -84,21 +92,6 @@ async function fetchAllQuestions(quizId: string): Promise<FirestoreQuizQuestion[
         correctAnswer: data.correctAnswer,
       };
     });
-}
-
-const getQuizQuestionsFlow = ai.defineFlow(
-  {
-    name: 'getQuizQuestionsFlow',
-    inputSchema: GetQuizQuestionsInputSchema,
-    outputSchema: z.array(QuizQuestionSchema),
-  },
-  async ({quizId, count}) => {
-    const allQuestions = await fetchAllQuestions(quizId);
-
-    if (allQuestions.length === 0) {
-      console.log('No questions found for this quiz.');
-      return [];
-    }
 
     // Simple random shuffle and slice
     const shuffled = allQuestions.sort(() => 0.5 - Math.random());
@@ -120,7 +113,20 @@ const checkQuizAnswersFlow = ai.defineFlow(
         outputSchema: CheckQuizAnswersOutputSchema,
     },
     async ({quizId, answers}) => {
-        const allQuestions = await fetchAllQuestions(quizId);
+        const db = getFirestore(app);
+        const questionsRef = collection(db, 'quizzes', quizId, 'questions');
+        const snapshot = await getDocs(questionsRef);
+
+        const allQuestions: FirestoreQuizQuestion[] = snapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            questionText: data.questionText,
+            options: data.options,
+            correctAnswer: data.correctAnswer,
+          };
+        });
+
         const questionMap = new Map(allQuestions.map(q => [q.id, q]));
 
         let correctAnswersCount = 0;
