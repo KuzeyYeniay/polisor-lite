@@ -21,14 +21,6 @@ type FirestoreQuizQuestion = {
   correctAnswer: string;
 };
 
-// This is the question format that will be used in the component state.
-// It includes the question text.
-type QuizQuestion = {
-  id: string;
-  questionText: string;
-  options: string[];
-};
-
 type UserAnswer = {
   questionId: string;
   answer: string;
@@ -40,8 +32,7 @@ export default function QuizPage() {
   const { id: quizId } = params;
   const { toast } = useToast();
 
-  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
-  const [allQuestionsWithAnswers, setAllQuestionsWithAnswers] = useState<FirestoreQuizQuestion[]>([]);
+  const [questions, setQuestions] = useState<FirestoreQuizQuestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -77,17 +68,7 @@ export default function QuizPage() {
         const shuffled = fetchedQuestions.sort(() => 0.5 - Math.random());
         const selectedQuestions = shuffled.slice(0, 15);
         
-        // Store the full questions with answers for grading later
-        setAllQuestionsWithAnswers(selectedQuestions);
-
-        // Create a version of the questions for the client without the correct answer
-        const questionsForClient: QuizQuestion[] = selectedQuestions.map(q => ({
-            id: q.id,
-            questionText: q.questionText,
-            options: q.options,
-        }));
-        
-        setQuestions(questionsForClient);
+        setQuestions(selectedQuestions);
 
       } catch (error) {
         console.error('Failed to fetch quiz questions:', error);
@@ -141,11 +122,10 @@ export default function QuizPage() {
   const handleSubmit = (finalAnswers: UserAnswer[]) => {
       setIsSubmitting(true);
       
-      const questionMap = new Map(allQuestionsWithAnswers.map(q => [q.id, q]));
       let correctAnswersCount = 0;
 
       for (const userAnswer of finalAnswers) {
-          const question = questionMap.get(userAnswer.questionId);
+          const question = questions.find(q => q.id === userAnswer.questionId);
           if (question && question.correctAnswer === userAnswer.answer) {
               correctAnswersCount++;
           }
