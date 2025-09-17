@@ -1,44 +1,40 @@
 import Image from 'next/image';
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { news } from '@/lib/data';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { lessons } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { NewsGenerator } from '@/components/news-generator';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-export default function NewsPage() {
+export default function InstructorsPage() {
+  // Create a unique list of teachers
+  const teachers = lessons.reduce((acc, lesson) => {
+    if (!acc.some(teacher => teacher.name === lesson.teacher)) {
+      acc.push({
+        name: lesson.teacher,
+        imageId: lesson.teacherImageId,
+      });
+    }
+    return acc;
+  }, [] as { name: string; imageId: string }[]);
+
   return (
     <div className="container py-12">
       <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold tracking-tight">News & Updates</h1>
-        <p className="text-muted-foreground mt-2">The latest articles and announcements from PoliTo.</p>
+        <h1 className="text-4xl font-bold tracking-tight">Eğitmenlerimiz</h1>
+        <p className="text-muted-foreground mt-2">Sizi başarıya ulaştıracak uzman ve deneyimli eğitmen kadromuzla tanışın.</p>
       </div>
 
-      <NewsGenerator />
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {news.map((article) => {
-          const articleImage = PlaceHolderImages.find((p) => p.id === article.imageId);
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {teachers.map((teacher) => {
+          const teacherImage = PlaceHolderImages.find((p) => p.id === teacher.imageId);
           return (
-            <Card key={article.id} className="overflow-hidden transition-transform hover:scale-105 hover:shadow-lg">
-                {articleImage && (
-                    <div className="relative h-56 w-full">
-                        <Image
-                            src={articleImage.imageUrl}
-                            alt={article.title}
-                            fill
-                            className="object-cover"
-                            data-ai-hint={articleImage.imageHint}
-                        />
-                    </div>
-                )}
-              <CardHeader>
-                <Link href={article.link}>
-                  <CardTitle className="hover:text-primary transition-colors">{article.title}</CardTitle>
-                </Link>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">{article.summary}</p>
-              </CardContent>
+             <Card key={teacher.name} className="text-center flex flex-col items-center p-6 transition-transform hover:scale-105 hover:shadow-lg">
+                <Avatar className="w-32 h-32 mb-4 border-4 border-primary">
+                    {teacherImage && <AvatarImage src={teacherImage.imageUrl} alt={teacher.name} data-ai-hint={teacherImage.imageHint} />}
+                    <AvatarFallback>{teacher.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <CardHeader className="p-0">
+                    <CardTitle className="text-xl">{teacher.name}</CardTitle>
+                </CardHeader>
             </Card>
           );
         })}
