@@ -11,7 +11,7 @@ import type { TeacherMaterial } from '@/lib/data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Download, FileText, AlertTriangle, BookOpen, BrainCircuit, Image as ImageIcon, ZoomIn } from 'lucide-react';
+import { Download, FileText, AlertTriangle, BookOpen, BrainCircuit, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
@@ -153,8 +153,20 @@ export default function StudentLessonPortal() {
                     </div>
                     <div className="md:col-span-3">
                         {selectedImage ? (
-                             <div className="relative h-[40rem] w-full bg-muted rounded-lg flex items-center justify-center overflow-hidden border">
-                                <Image src={selectedImage.downloadURL!} alt={selectedImage.fileName} fill objectFit="contain" className="p-4"/>
+                             <div 
+                                className="relative h-[40rem] w-full bg-muted rounded-lg flex items-center justify-center overflow-hidden border"
+                                onContextMenu={(e) => e.preventDefault()}
+                                onDragStart={(e) => e.preventDefault()}
+                              >
+                                {selectedImage.downloadURL && (
+                                  <Image 
+                                    src={selectedImage.downloadURL} 
+                                    alt={selectedImage.fileName} 
+                                    fill 
+                                    style={{ objectFit: 'contain' }}
+                                    className="p-4"
+                                  />
+                                )}
                              </div>
                         ) : (
                             <div className="h-[40rem] w-full bg-muted rounded-lg flex items-center justify-center text-muted-foreground">
