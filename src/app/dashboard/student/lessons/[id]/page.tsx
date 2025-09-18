@@ -49,7 +49,6 @@ export default function StudentLessonPortal() {
       const materialsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TeacherMaterial));
       setMaterials(materialsData);
       
-      // Set the first image as the default selected image
       const firstImage = materialsData.find(m => m.fileType.startsWith('image/'));
       setSelectedImage(firstImage || null);
       
@@ -166,6 +165,13 @@ export default function StudentLessonPortal() {
                                     style={{ objectFit: 'contain' }}
                                     className="p-4"
                                   />
+                                )}
+                                {user && (
+                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                        <p className="text-2xl font-bold text-black/20 dark:text-white/20 transform -rotate-45 select-none">
+                                            PoliSor - {user.displayName}
+                                        </p>
+                                    </div>
                                 )}
                              </div>
                         ) : (
