@@ -13,6 +13,10 @@ import {z} from 'genkit';
 
 const ChatbotAnswersQuestionsInputSchema = z.object({
   question: z.string().describe('The user question to be answered by the chatbot.'),
+  history: z.array(z.object({
+    role: z.enum(['user', 'model']),
+    content: z.string(),
+  })).optional().describe('The conversation history.'),
 });
 export type ChatbotAnswersQuestionsInput = z.infer<typeof ChatbotAnswersQuestionsInputSchema>;
 
@@ -47,9 +51,14 @@ Main Things you have to know about PoliSor:
 -PoliSor teachers are actually successful students of the Politecnico di Torino, therefore they know the best to make you success in Politecnico di Torino
 Here is the conversation history:
 {{#each history}}
-{{role}}: {{{content}}}
+{{#if (eq role 'user')}}
+user: {{{content}}}
+{{else}}
+model: {{{content}}}
+{{/if}}
 {{/each}}
     
+user: {{{question}}}
 model:`,
 });
 

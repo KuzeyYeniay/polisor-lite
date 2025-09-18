@@ -46,12 +46,22 @@ export function Chatbot() {
     if (input.trim() === "") return;
 
     const userMessage: Message = { text: input, sender: "user" };
-    setMessages((prev) => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInput("");
     setIsLoading(true);
 
     try {
-      const response = await chatbotAnswersQuestions({ question: input });
+      const historyForApi = newMessages.slice(1).map(msg => ({
+          role: msg.sender === 'user' ? 'user' : 'model',
+          content: msg.text,
+      }));
+        
+      const response = await chatbotAnswersQuestions({ 
+        question: input,
+        history: historyForApi,
+      });
+
       const botMessage: Message = { text: response.answer, sender: "PoliBot" };
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
