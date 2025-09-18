@@ -155,11 +155,6 @@ export default function StudentLessonPortal() {
                         {selectedImage ? (
                              <div className="relative h-[40rem] w-full bg-muted rounded-lg flex items-center justify-center overflow-hidden border">
                                 <Image src={selectedImage.downloadURL!} alt={selectedImage.fileName} fill objectFit="contain" className="p-4"/>
-                                 <Button size="icon" variant="ghost" className="absolute top-2 right-2" asChild>
-                                    <a href={selectedImage.downloadURL} target="_blank" rel="noopener noreferrer" aria-label="View full image">
-                                        <ZoomIn className="h-5 w-5" />
-                                    </a>
-                                 </Button>
                              </div>
                         ) : (
                             <div className="h-[40rem] w-full bg-muted rounded-lg flex items-center justify-center text-muted-foreground">
