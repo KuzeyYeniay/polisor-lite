@@ -54,7 +54,8 @@ export function Chatbot() {
     try {
       const historyForApi = newMessages.slice(1).map(msg => ({
           role: msg.sender === 'user' ? 'user' : 'model',
-          content: msg.text,
+          // Prepend the role to the content for the prompt
+          content: `${msg.sender === 'user' ? 'user' : 'model'}: ${msg.text}`,
       }));
         
       const response = await chatbotAnswersQuestions({ 

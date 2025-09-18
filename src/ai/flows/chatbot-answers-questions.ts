@@ -16,7 +16,7 @@ const ChatbotAnswersQuestionsInputSchema = z.object({
   history: z.array(z.object({
     role: z.enum(['user', 'model']),
     content: z.string(),
-  })).optional().describe('The conversation history.'),
+  })).optional().describe('The conversation history. Each message is prepended with the role.'),
 });
 export type ChatbotAnswersQuestionsInput = z.infer<typeof ChatbotAnswersQuestionsInputSchema>;
 
@@ -51,11 +51,7 @@ Main Things you have to know about PoliSor:
 -PoliSor teachers are actually successful students of the Politecnico di Torino, therefore they know the best to make you success in Politecnico di Torino
 Here is the conversation history:
 {{#each history}}
-{{#if (eq role 'user')}}
-user: {{{content}}}
-{{else}}
-model: {{{content}}}
-{{/if}}
+{{{content}}}
 {{/each}}
     
 user: {{{question}}}
