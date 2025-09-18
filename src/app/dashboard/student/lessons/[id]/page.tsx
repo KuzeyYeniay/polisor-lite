@@ -167,11 +167,15 @@ export default function StudentLessonPortal() {
                                   />
                                 )}
                                 {user && (
-                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                        <p className="text-2xl font-bold text-black/20 dark:text-white/20 transform -rotate-45 select-none">
-                                            PoliSor - {user.displayName}
-                                        </p>
-                                    </div>
+                                     <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 pointer-events-none">
+                                        {[...Array(9)].map((_, i) => (
+                                          <div key={i} className="flex items-center justify-center">
+                                            <p className="text-xl font-bold text-black/10 dark:text-white/10 transform -rotate-45 select-none">
+                                              PoliSor - {user.displayName}
+                                            </p>
+                                          </div>
+                                        ))}
+                                      </div>
                                 )}
                              </div>
                         ) : (
