@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { notFound, useParams } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { db } from '@/lib/firebase';
@@ -8,11 +9,12 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { lessons, type Lesson } from '@/lib/data';
 import type { TeacherMaterial } from '@/lib/data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Download, FileText, AlertTriangle, BookOpen, BrainCircuit } from 'lucide-react';
+import { Download, FileText, AlertTriangle, BookOpen, BrainCircuit, Image as ImageIcon, ZoomIn } from 'lucide-react';
 import Link from 'next/link';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
 
 export default function StudentLessonPortal() {
   const params = useParams();
@@ -22,6 +24,8 @@ export default function StudentLessonPortal() {
   const [materials, setMaterials] = useState<TeacherMaterial[]>([]);
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState<TeacherMaterial | null>(null);
+
 
   const isEnrolled = enrolledCourses.includes(id as string);
 
@@ -44,6 +48,11 @@ export default function StudentLessonPortal() {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const materialsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TeacherMaterial));
       setMaterials(materialsData);
+      
+      // Set the first image as the default selected image
+      const firstImage = materialsData.find(m => m.fileType.startsWith('image/'));
+      setSelectedImage(firstImage || null);
+      
       setIsLoading(false);
     }, (error) => {
       console.error("Error fetching materials:", error);
@@ -52,6 +61,9 @@ export default function StudentLessonPortal() {
 
     return () => unsubscribe();
   }, [isEnrolled, lesson, authLoading]);
+
+  const imageMaterials = materials.filter(m => m.fileType.startsWith('image/'));
+  const otherMaterials = materials.filter(m => !m.fileType.startsWith('image/'));
 
   if (authLoading || (isLoading && isEnrolled)) {
     return (
@@ -63,10 +75,17 @@ export default function StudentLessonPortal() {
             <Skeleton className="h-8 w-1/3" />
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-1">
+                    <div className="space-y-2">
+                        <Skeleton className="h-12 w-full" />
+                        <Skeleton className="h-12 w-full" />
+                        <Skeleton className="h-12 w-full" />
+                    </div>
+                </div>
+                <div className="md:col-span-2">
+                    <Skeleton className="h-96 w-full" />
+                </div>
             </div>
           </CardContent>
         </Card>
@@ -114,49 +133,78 @@ export default function StudentLessonPortal() {
 
        <Card>
         <CardHeader>
-          <CardTitle>Course Materials</CardTitle>
-          <CardDescription>All materials uploaded by your teacher for this lesson.</CardDescription>
+          <CardTitle>Image Gallery</CardTitle>
+          <CardDescription>Select an image to view it.</CardDescription>
         </CardHeader>
         <CardContent>
-           <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>File Name</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Date Uploaded</TableHead>
-                  <TableHead className="text-right">Download</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {materials.length > 0 ? (
-                  materials.map((material) => (
-                    <TableRow key={material.id}>
-                      <TableCell className="font-medium flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-muted-foreground"/>
-                        {material.fileName}
-                      </TableCell>
-                      <TableCell>{material.fileType}</TableCell>
-                      <TableCell>{material.uploadDate}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" asChild>
-                           <a href={material.downloadURL} target="_blank" rel="noopener noreferrer">
-                                <Download className="h-4 w-4" />
-                           </a>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={4} className="h-24 text-center">
-                      No materials have been uploaded for this course yet.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+            {imageMaterials.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="md:col-span-1">
+                        <ScrollArea className="h-96 pr-4">
+                            <div className="space-y-2">
+                            {imageMaterials.map(material => (
+                                <button key={material.id} onClick={() => setSelectedImage(material)} className={cn("w-full text-left p-3 rounded-lg border transition-colors flex items-center gap-3", selectedImage?.id === material.id ? "bg-muted border-primary" : "hover:bg-muted/50")}>
+                                    <ImageIcon className="h-5 w-5 text-primary"/>
+                                    <span className="flex-1 truncate">{material.fileName}</span>
+                                </button>
+                            ))}
+                            </div>
+                        </ScrollArea>
+                    </div>
+                    <div className="md:col-span-2">
+                        {selectedImage ? (
+                             <div className="relative h-96 w-full bg-muted rounded-lg flex items-center justify-center overflow-hidden border">
+                                <Image src={selectedImage.downloadURL!} alt={selectedImage.fileName} layout="fill" objectFit="contain" className="p-4"/>
+                                 <Button size="icon" variant="ghost" className="absolute top-2 right-2" asChild>
+                                    <a href={selectedImage.downloadURL} target="_blank" rel="noopener noreferrer" aria-label="View full image">
+                                        <ZoomIn className="h-5 w-5" />
+                                    </a>
+                                 </Button>
+                             </div>
+                        ) : (
+                            <div className="h-96 w-full bg-muted rounded-lg flex items-center justify-center text-muted-foreground">
+                                <p>No image selected.</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            ) : (
+                <div className="h-48 flex items-center justify-center text-muted-foreground bg-muted/50 rounded-lg">
+                    <p>No image materials have been uploaded for this course yet.</p>
+                </div>
+            )}
         </CardContent>
       </Card>
+      
+      {otherMaterials.length > 0 && (
+         <Card className="mt-8">
+            <CardHeader>
+                <CardTitle>Other Materials</CardTitle>
+                <CardDescription>Additional downloadable files for this lesson.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                 <div className="space-y-2">
+                {otherMaterials.map((material) => (
+                    <div key={material.id} className="flex justify-between items-center p-3 rounded-lg border hover:bg-muted/50">
+                        <div className="flex items-center gap-3">
+                            <FileText className="h-5 w-5 text-primary"/>
+                            <div>
+                                <p className="font-medium">{material.fileName}</p>
+                                <p className="text-xs text-muted-foreground">{material.fileType}</p>
+                            </div>
+                        </div>
+                        <Button variant="ghost" size="icon" asChild>
+                            <a href={material.downloadURL} target="_blank" rel="noopener noreferrer" aria-label={`Download ${material.fileName}`}>
+                                <Download className="h-5 w-5" />
+                            </a>
+                        </Button>
+                    </div>
+                ))}
+                </div>
+            </CardContent>
+        </Card>
+      )}
+
 
       {id === 'circuit-design' && (
         <Card className="mt-8">
