@@ -38,7 +38,7 @@ export default function LessonDetailPage({ params }: { params: { id: string } })
                 <User className="w-5 h-5" />
                 {lesson.teacher}
             </p>
-            <p className="text-base leading-relaxed">{lesson.description}</p>
+            <p className="text-base leading-relaxed">{lesson.description_long}</p>
         </div>
         <div className="md:col-span-1">
             <Card>

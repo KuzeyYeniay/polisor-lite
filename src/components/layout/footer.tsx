@@ -8,7 +8,7 @@ export function Footer() {
         <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
           <Icons.logo className="h-6 w-6 text-primary" />
           <p className="text-center text-sm leading-loose md:text-left">
-            Built for Politecnico di Torino students.
+            Akademik Başarı İçin
           </p>
         </div>
         <div className="text-center text-sm text-muted-foreground md:text-right">

@@ -6,21 +6,18 @@ export default function ContactPage() {
   const info = [
     {
       icon: <Phone className="h-6 w-6 text-primary" />,
-      title: 'Phone',
-      value: contactInfo.phone,
-      href: `tel:${contactInfo.phone.replace(/\s/g, '')}`,
+      title: 'Telefon',
+      value: '+39 344 719 9398',
     },
     {
       icon: <Mail className="h-6 w-6 text-primary" />,
       title: 'Email',
-      value: contactInfo.email,
-      href: `mailto:${contactInfo.email}`,
+      value: 'poligrup44@gmail.com',
     },
     {
       icon: <MapPin className="h-6 w-6 text-primary" />,
-      title: 'Address',
-      value: contactInfo.address,
-      href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(contactInfo.address)}`,
+      title: 'Adres',
+      value: 'Torino TO,İtalya',
     },
   ];
 

@@ -173,15 +173,15 @@ export default function QuizPage() {
                     <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full mb-4" style={{ backgroundColor: isPass ? 'var(--primary)' : 'var(--destructive)' }}>
                         {isPass ? <CheckCircle className="h-10 w-10 text-primary-foreground" /> : <AlertTriangle className="h-10 w-10 text-destructive-foreground" />}
                     </div>
-                    <CardTitle>Quiz Complete!</CardTitle>
-                    <CardDescription>You scored {score.score} out of {score.total}.</CardDescription>
+                    <CardTitle>Quiz Tamamlandı!</CardTitle>
+                    <CardDescription>Skorun: {score.score} Üzerinden: {score.total}.</CardDescription>
                 </CardHeader>
                 <CardContent>
                      <p className="text-4xl font-bold mb-4">{percentage}%</p>
                     <Progress value={percentage} className="h-4 mb-6" />
                     <p className="text-muted-foreground mb-6">{isPass ? "Great job! You passed the quiz." : "You did not pass. Better luck next time!"}</p>
                     <Button onClick={() => router.push(`/dashboard/student/lessons/${quizId}`)}>
-                        Back to Lesson Portal
+                        Ders Paneline Dön
                     </Button>
                 </CardContent>
             </Card>

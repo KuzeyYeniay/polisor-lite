@@ -180,14 +180,14 @@ export default function StudentLessonPortal() {
                              </div>
                         ) : (
                             <div className="h-[40rem] w-full bg-muted rounded-lg flex items-center justify-center text-muted-foreground">
-                                <p>No image selected.</p>
+                                <p>Resim Seçilmedi</p>
                             </div>
                         )}
                     </div>
                 </div>
             ) : (
                 <div className="h-48 flex items-center justify-center text-muted-foreground bg-muted/50 rounded-lg">
-                    <p>No image materials have been uploaded for this course yet.</p>
+                    <p>Henüz bu kursa bir materyal eklenmedi.</p>
                 </div>
             )}
         </CardContent>
@@ -196,8 +196,8 @@ export default function StudentLessonPortal() {
       {otherMaterials.length > 0 && (
          <Card className="mt-8">
             <CardHeader>
-                <CardTitle>Other Materials</CardTitle>
-                <CardDescription>Additional downloadable files for this lesson.</CardDescription>
+                <CardTitle>Diğer Materyaller</CardTitle>
+                <CardDescription>İndirebileceğiniz diğer materyaller</CardDescription>
             </CardHeader>
             <CardContent>
                  <div className="space-y-2">
@@ -228,14 +228,14 @@ export default function StudentLessonPortal() {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <BrainCircuit className="w-6 h-6 text-primary"/>
-                    Test Your Knowledge
+                    Bilgi Düzeyini Test Et
                 </CardTitle>
-                <CardDescription>Take a practice quiz to check your understanding of the material.</CardDescription>
+                <CardDescription>Midterm-1 deneme testini yap ve seviyeni ölç</CardDescription>
             </CardHeader>
             <CardContent>
-                <p className="text-muted-foreground mb-4">You'll be presented with 15 random questions from the question bank. Good luck!</p>
+                <p className="text-muted-foreground mb-4">15 adet Midterm-1'de karşına çıkacak soru tipi göreceksin. Bol Şans!</p>
                 <Button asChild>
-                    <Link href={`/dashboard/student/quiz/${id}`}>Start Quiz</Link>
+                    <Link href={`/dashboard/student/quiz/${id}`}>Quiz'e başla</Link>
                 </Button>
             </CardContent>
         </Card>

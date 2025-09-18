@@ -120,6 +120,21 @@ export default function Home() {
                 </Link>
             </div>
         </section>
+
+        {/* Collabration Section */}
+        <section className="py-12">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold tracking-tight">Ekibimize Katılın</h2>
+            <p className="text-muted-foreground mt-2">PoliSor gelişime ve değişime açık, bu yüzden her zaman tutkulu eğitimciler arıyoruz. Potansiyel bir iş birliği için, sizden haber almak isteriz.</p>
+          </div>
+           <div className="text-center pt-8">
+                <Link href="/contact">
+                    <Button variant="link" className="text-primary">
+                        Bize Ulaşın<ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                </Link>
+            </div>
+        </section>
       </div>
       <Chatbot />
     </>

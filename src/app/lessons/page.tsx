@@ -38,7 +38,7 @@ export default function LessonsPage() {
               </CardContent>
               <CardFooter>
                 <Link href={`/lessons/${lesson.id}`} className="w-full">
-                  <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary/10">View Calendar & Details</Button>
+                  <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary/10">Takvim & Detaylar</Button>
                 </Link>
               </CardFooter>
             </Card>

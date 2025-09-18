@@ -18,15 +18,15 @@ import { cn } from "@/lib/utils";
 
 type Message = {
   text: string;
-  sender: "user" | "bot";
+  sender: "user" | "PoliBot";
 };
 
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
-      sender: "bot",
-      text: "Hello! I'm the PoliSor Lite assistant. How can I help you with questions about Politecnico di Torino?",
+      sender: "PoliBot",
+      text: "Merhaba! Ben PoliBot. Sana PoliSor hakkında sorularına cevap vermek için buradayım. ",
     },
   ]);
   const [input, setInput] = useState("");
@@ -52,13 +52,13 @@ export function Chatbot() {
 
     try {
       const response = await chatbotAnswersQuestions({ question: input });
-      const botMessage: Message = { text: response.answer, sender: "bot" };
+      const botMessage: Message = { text: response.answer, sender: "PoliBot" };
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       console.error("Chatbot error:", error);
       const errorMessage: Message = {
         text: "Sorry, I'm having trouble connecting. Please try again later.",
-        sender: "bot",
+        sender: "PoliBot",
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
@@ -85,7 +85,7 @@ export function Chatbot() {
         <SheetContent className="flex flex-col">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
-              <Bot className="text-primary" /> PoliSor Assistant
+              <Bot className="text-primary" /> PoliBot
             </SheetTitle>
           </SheetHeader>
           <ScrollArea className="flex-1 my-4 pr-4" ref={scrollAreaRef}>
@@ -98,7 +98,7 @@ export function Chatbot() {
                     message.sender === "user" ? "justify-end" : "justify-start"
                   )}
                 >
-                  {message.sender === "bot" && (
+                  {message.sender === "PoliBot" && (
                     <Avatar className="h-8 w-8 border border-primary">
                       <AvatarFallback className="bg-primary text-primary-foreground">
                         <Bot className="h-5 w-5" />

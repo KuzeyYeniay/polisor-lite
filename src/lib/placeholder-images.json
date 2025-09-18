@@ -39,13 +39,13 @@
     {
       "id": "teacher1",
       "description": "Portrait of Ada Lovelace",
-      "imageUrl": "https://picsum.photos/seed/teacher1/400/400",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-5751693164-b0fd0.firebasestorage.app/o/materials%2Fimage1.png?alt=media&token=cffd2760-07e2-4c80-a951-d947a0f5f837",
       "imageHint": "portrait woman"
     },
     {
       "id": "teacher2",
       "description": "Portrait of James Watt",
-      "imageUrl": "https://picsum.photos/seed/teacher2/400/400",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-5751693164-b0fd0.firebasestorage.app/o/materials%2FKaanSelf.JPG?alt=media&token=8cd70986-cc53-4729-acd1-02bb7bcad04c",
       "imageHint": "portrait man"
     },
     {

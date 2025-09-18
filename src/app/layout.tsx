@@ -7,8 +7,8 @@ import { Footer } from '@/components/layout/footer';
 import { AuthProvider } from '@/hooks/use-auth';
 
 export const metadata: Metadata = {
-  title: 'PoliSor Lite',
-  description: 'A modern, accessible portal for Politecnico di Torino.',
+  title: 'PoliSor',
+  description: 'Akademik başarı için',
 };
 
 export default function RootLayout({

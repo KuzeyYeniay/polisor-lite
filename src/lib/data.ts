@@ -2,6 +2,7 @@ export type Lesson = {
   id: string;
   title: string;
   description: string;
+  description_long: string;
   teacher: string;
   teacherImageId: string;
   imageId: string;
@@ -18,39 +19,42 @@ export type NewsArticle = {
 
 export const lessons: Lesson[] = [
   {
-    id: 'computer-science-101',
-    title: 'Computer Science 101',
-    description: 'An introductory course to the fundamentals of computer science and programming.',
-    teacher: 'Prof. Ada Lovelace',
+    id: 'computer-sciences',
+    title: 'Computer Sciences',
+    description: 'Algoritmalar, veri yapıları ve algoritmik düşünme ilkeleri dünyasını keşfedin.',
+    description_long: '   Kuzey, Politecnico di Torino \'da Bilgisayar Mühendisliği öğrencisi ve bilgisayar bilimine son derece ilgilidir. Akranlarının başarılı olmasına yardımcı olma konusunda tutkuludur. Kendisi Computer Sciences dersinde sizlerle her hafta, okulun müfredatıyla bire bir uyumlu sınavlara sizleri kusursuz hazırlayacak olan kaynaklarını paylaşacak, cumartesi günleri ise bu kaynakların soru çözüm saatini düzenliyor olacak.',
+    teacher: 'Kuzey',
     teacherImageId: 'teacher1',
     imageId: 'lesson1',
     calendar: [
-      { day: 'Monday', time: '10:00 - 12:00', room: 'Room 1A' },
-      { day: 'Wednesday', time: '14:00 - 16:00', room: 'Room 1A' },
+      { day: 'Pazartesi', time: '12:00', room: 'Haftalık Kaynak Paylaşımı' },
+      { day: 'Cumartesi', time: '10:00 - 12:30', room: 'Online Soru Çözüm Saati' },
     ],
   },
   {
-    id: 'mechanical-engineering',
-    title: 'Mechanical Engineering',
-    description: 'Explore the principles of mechanics, materials, and energy.',
-    teacher: 'Prof. James Watt',
+    id: 'math-1',
+    title: 'Mathematical Analysis-I',
+    description: 'Limitler ve türevlerden, integrallere ve sonsuz serilere kadar kalkülüsün temellerine derinlemesine dalın.',
+    description_long: '   Kaan, Politecnico di Torino\'da Bilgisayar Mühendisliği öğrencisi ve matematik konseptlerinde etkili öğretim yöntemleriyle tanınır. Karmaşık kavramları kolayca anlaşılır hale getirir. Kendisi Mathematical Analysis-I dersinde sizlerle her hafta, okulun müfredatıyla bire bir uyumlu sınavlara sizleri kusursuz hazırlayacak olan kaynaklarını paylaşacak, cumartesi günleri ise bu kaynakların soru çözüm saatini düzenliyor olacak.',
+    teacher: 'Kaan',
     teacherImageId: 'teacher2',
     imageId: 'lesson2',
     calendar: [
-      { day: 'Tuesday', time: '09:00 - 11:00', room: 'Lab 3B' },
-      { day: 'Friday', time: '11:00 - 13:00', room: 'Lab 3B' },
+      { day: 'Pazartesi', time: '12:00', room: 'Haftalık Kaynak Paylaşımı' },
+      { day: 'Cumartesi', time: '10:00 - 12:30', room: 'Online Soru Çözüm Saati' },
     ],
   },
   {
     id: 'circuit-design',
-    title: 'Circuit Design & Analysis',
-    description: 'Learn to design and analyze analog and digital electronic circuits.',
-    teacher: 'Prof. Nikola Tesla',
-    teacherImageId: 'teacher3',
+    title: 'Chemistry',
+    description: 'Maddenin yapı taşlarını ve dünyamızı şekillendiren kimyasal reaksiyonlara hakim olun.',
+    description_long: '   Kuzey, Politecnico di Torino \'da Bilgisayar Mühendisliği öğrencisi ve kimya sınavlarında başarılı olmanın anahtarı olacak tüyolara sahiptir. Derin bir müfredatı olan Kimya dersi için sizleri derin bir soru havuzuyla karşılayacak. Kendisi Kimya dersinde sizlerle her hafta, okulun müfredatıyla bire bir uyumlu sınavlara sizleri kusursuz hazırlayacak olan kaynaklarını paylaşacak, cumartesi günleri ise bu kaynakların soru çözüm saatini düzenliyor olacak.',
+    teacher: 'Kuzey',
+    teacherImageId: 'teacher1',
     imageId: 'lesson3',
     calendar: [
-      { day: 'Monday', time: '16:00 - 18:00', room: 'Elec. Lab 1' },
-      { day: 'Thursday', time: '09:00 - 11:00', room: 'Elec. Lab 1' },
+      { day: 'Pazartesi', time: '12:00', room: 'Haftalık Kaynak Paylaşımı' },
+      { day: 'Cumartesi', time: '10:00 - 12:30', room: 'Online Soru Çözüm Saati' },
     ],
   },
 ];
@@ -73,9 +77,9 @@ export const news: NewsArticle[] = [
 ];
 
 export const contactInfo = {
-  phone: '+39 011 090 1111',
-  email: 'contact@polisor.lite',
-  address: 'Corso Duca degli Abruzzi, 24, 10129 Torino TO, Italy',
+  phone: '+39 344 719 9398',
+  email: 'poligrup44@gmail.com',
+  address: 'Torino TO, Italy',
 };
 
 export type TeacherMaterial = {
