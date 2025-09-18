@@ -62,8 +62,8 @@ export default function StudentLessonPortal() {
     return () => unsubscribe();
   }, [isEnrolled, lesson, authLoading]);
 
-  const imageMaterials = materials.filter(m => m.fileType.startsWith('image/'));
-  const otherMaterials = materials.filter(m => !m.fileType.startsWith('image/'));
+  const imageMaterials = materials.filter(m => m.fileType.startsWith('image/') || m.fileType.startsWith('application/pdf'));
+  const otherMaterials = materials.filter(m => !m.fileType.startsWith('image/') && !m.fileType.startsWith('application/pdf'));
 
   if (authLoading || (isLoading && isEnrolled)) {
     return (
@@ -75,7 +75,7 @@ export default function StudentLessonPortal() {
             <Skeleton className="h-8 w-1/3" />
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="md:col-span-1">
                     <div className="space-y-2">
                         <Skeleton className="h-12 w-full" />
@@ -83,8 +83,8 @@ export default function StudentLessonPortal() {
                         <Skeleton className="h-12 w-full" />
                     </div>
                 </div>
-                <div className="md:col-span-2">
-                    <Skeleton className="h-96 w-full" />
+                <div className="md:col-span-3">
+                    <Skeleton className="h-[40rem] w-full" />
                 </div>
             </div>
           </CardContent>
@@ -138,9 +138,9 @@ export default function StudentLessonPortal() {
         </CardHeader>
         <CardContent>
             {imageMaterials.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div className="md:col-span-1">
-                        <ScrollArea className="h-96 pr-4">
+                        <ScrollArea className="h-[40rem] pr-4">
                             <div className="space-y-2">
                             {imageMaterials.map(material => (
                                 <button key={material.id} onClick={() => setSelectedImage(material)} className={cn("w-full text-left p-3 rounded-lg border transition-colors flex items-center gap-3", selectedImage?.id === material.id ? "bg-muted border-primary" : "hover:bg-muted/50")}>
@@ -151,10 +151,10 @@ export default function StudentLessonPortal() {
                             </div>
                         </ScrollArea>
                     </div>
-                    <div className="md:col-span-2">
+                    <div className="md:col-span-3">
                         {selectedImage ? (
-                             <div className="relative h-96 w-full bg-muted rounded-lg flex items-center justify-center overflow-hidden border">
-                                <Image src={selectedImage.downloadURL!} alt={selectedImage.fileName} layout="fill" objectFit="contain" className="p-4"/>
+                             <div className="relative h-[40rem] w-full bg-muted rounded-lg flex items-center justify-center overflow-hidden border">
+                                <Image src={selectedImage.downloadURL!} alt={selectedImage.fileName} fill objectFit="contain" className="p-4"/>
                                  <Button size="icon" variant="ghost" className="absolute top-2 right-2" asChild>
                                     <a href={selectedImage.downloadURL} target="_blank" rel="noopener noreferrer" aria-label="View full image">
                                         <ZoomIn className="h-5 w-5" />
@@ -162,7 +162,7 @@ export default function StudentLessonPortal() {
                                  </Button>
                              </div>
                         ) : (
-                            <div className="h-96 w-full bg-muted rounded-lg flex items-center justify-center text-muted-foreground">
+                            <div className="h-[40rem] w-full bg-muted rounded-lg flex items-center justify-center text-muted-foreground">
                                 <p>No image selected.</p>
                             </div>
                         )}
