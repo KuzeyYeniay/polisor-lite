@@ -42,7 +42,7 @@ import Link from 'next/link';
 
 const uploadSchema = z.object({
   lessonId: z.string().min(1, 'Please select a lesson.'),
-  file: z.instanceof(FileList).refine((files) => files?.length === 1, 'File is required.'),
+  file: z.any().refine((files) => files?.length === 1, 'File is required.'),
 });
 
 export default function TeacherDashboard() {
