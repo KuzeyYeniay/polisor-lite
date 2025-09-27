@@ -39,8 +39,8 @@ export default function StudentDashboard() {
   return (
     <div className="container py-12">
       <div className="mb-10">
-        <h1 className="text-4xl font-bold tracking-tight">Student Dashboard</h1>
-        <p className="text-muted-foreground mt-2">Your courses, materials, and progress.</p>
+        <h1 className="text-4xl font-bold tracking-tight">Öğrenci Paneli</h1>
+        <p className="text-muted-foreground mt-2">Derslerin, materyallerin, ve gelişimin.</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {lessons.map((lesson) => {
@@ -57,21 +57,21 @@ export default function StudentDashboard() {
                     {isUnlocked ? (
                        <div className="flex items-center gap-2 text-green-600">
                         <Unlock className="h-4 w-4" />
-                        <span className="text-xs font-semibold">Unlocked</span>
+                        <span className="text-xs font-semibold">Açık</span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 text-destructive">
                         <Lock className="h-4 w-4" />
-                        <span className="text-xs font-semibold">Locked</span>
+                        <span className="text-xs font-semibold">Kilitli</span>
                       </div>
                     )}
                 </div>
               </CardHeader>
               <CardContent>
-                <h4 className="font-semibold mb-2">Materials</h4>
+                <h4 className="font-semibold mb-2">Materyaller</h4>
                 {!isUnlocked ? (
                   <div className="text-center text-muted-foreground bg-muted p-4 rounded-md">
-                      <p>Enroll in this course to access materials.</p>
+                      <p>Görüntülemek için kayıt yapmalısın</p>
                   </div>
                 ) : (
                   <div className="space-y-2">

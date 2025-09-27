@@ -3,37 +3,37 @@
     {
       "id": "hero",
       "description": "A modern university building.",
-      "imageUrl": "https://picsum.photos/seed/hero/1200/800",
+      "imageUrl": "https://images.unsplash.com/photo-1618255630366-f402c45736f6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx1bml2ZXJzaXR5JTIwY2FtcHVzfGVufDB8fHx8MTc1ODk3NzAzNXww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "university campus"
     },
     {
       "id": "lesson1",
       "description": "Students in a computer lab.",
-      "imageUrl": "https://picsum.photos/seed/lesson1/600/400",
+      "imageUrl": "https://images.unsplash.com/photo-1629904853716-f0bc54eea481?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjb21wdXRlciUyMGxhYnxlbnwwfHx8fDE3NTg5NTY3MzJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "computer lab"
     },
     {
       "id": "lesson2",
       "description": "A lecture hall with students.",
-      "imageUrl": "https://picsum.photos/seed/lesson2/600/400",
+      "imageUrl": "https://images.unsplash.com/photo-1544531585-f14f463149ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxsZWN0dXJlJTIwaGFsbHxlbnwwfHx8fDE3NTg5MjM0MDd8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "lecture hall"
     },
     {
       "id": "lesson3",
       "description": "An engineering workshop.",
-      "imageUrl": "https://picsum.photos/seed/lesson3/600/400",
+      "imageUrl": "https://images.unsplash.com/photo-1580893196685-f061a838ba99?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxlbmdpbmVlcmluZyUyMHdvcmtzaG9wfGVufDB8fHx8MTc1OTAxNTQxNXww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "engineering workshop"
     },
     {
-      "id": "news1",
-      "description": "A group of students collaborating on a project.",
-      "imageUrl": "https://picsum.photos/seed/news1/600/400",
+      "id": "poliev",
+      "description": "PoliEv - Torino Konaklama Danışmanınız",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-5751693164-b0fd0.firebasestorage.app/o/materials%2Fpoliev-sor.png?alt=media&token=69057b3f-4af1-4da3-8dbe-8572050c64e6",
       "imageHint": "students collaborating"
     },
     {
       "id": "news2",
       "description": "A robotics arm in a lab.",
-      "imageUrl": "https://picsum.photos/seed/news2/600/400",
+      "imageUrl": "https://images.unsplash.com/photo-1583781510690-3974db689286?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxyb2JvdGljcyUyMGxhYnxlbnwwfHx8fDE3NTg5NTEyMDN8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "robotics lab"
     },
     {
@@ -51,7 +51,7 @@
     {
       "id": "teacher3",
       "description": "Portrait of Nikola Tesla",
-      "imageUrl": "https://picsum.photos/seed/teacher3/400/400",
+      "imageUrl": "https://images.unsplash.com/photo-1560250097-0b93528c311a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwb3J0cmFpdCUyMG1hbnxlbnwwfHx8fDE3NTg5MjQ4NzF8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "portrait man"
     }
   ]

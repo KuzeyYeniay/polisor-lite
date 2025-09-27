@@ -73,8 +73,8 @@ export default function QuizPage() {
       } catch (error) {
         console.error('Failed to fetch quiz questions:', error);
         toast({
-          title: 'Error Loading Quiz',
-          description: 'There was an issue loading the questions. Please try again.',
+          title: 'Quiz Yüklenemedi',
+          description: 'Sorular yüklenirken bir hata oluştu. Lütfen yeniden dene.',
           variant: 'destructive',
         });
       } finally {
@@ -86,7 +86,7 @@ export default function QuizPage() {
 
   const handleNext = () => {
     if (selectedOption === null) {
-        toast({ title: 'Please select an answer.', variant: 'destructive' });
+        toast({ title: 'Lütfen bir şık işaretle.', variant: 'destructive' });
         return;
     }
     
@@ -199,9 +199,9 @@ export default function QuizPage() {
                 </CardTitle>
             </CardHeader>
             <CardContent>
-                <p className="text-muted-foreground">Could not load quiz questions. Please try again later.</p>
+                <p className="text-muted-foreground">Quiz soruları yüklenmedi. Lütfen tekrar dene.</p>
                 <Button asChild className="mt-6" variant="outline" onClick={() => router.back()}>
-                    <p>Go Back</p>
+                    <p>Geri Dön</p>
                 </Button>
             </CardContent>
          </Card>
@@ -225,7 +225,7 @@ export default function QuizPage() {
       <Card className="w-full max-w-2xl">
         <CardHeader>
             <Progress value={progress} className="mb-2 h-2" />
-            <CardTitle>Question {currentQuestionIndex + 1} of {questions.length}</CardTitle>
+            <CardTitle>Soru {currentQuestionIndex + 1} of {questions.length}</CardTitle>
             <CardDescription className="text-lg pt-4">{currentQuestion.questionText}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -241,11 +241,11 @@ export default function QuizPage() {
         <div className="flex justify-between p-6 pt-0">
              <Button variant="outline" onClick={handleBack} disabled={currentQuestionIndex === 0}>
                 <ChevronLeft className="mr-2"/>
-                Back
+                Geri
              </Button>
              <Button onClick={handleNext} disabled={isSubmitting}>
                 {isSubmitting && currentQuestionIndex === questions.length - 1 ? (
-                    <> <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting... </>
+                    <> <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Teslim ediliyor... </>
                 ) : (
                     currentQuestionIndex === questions.length - 1 ? 'Submit Quiz' : 'Next'
                 )}

@@ -22,14 +22,14 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  email: z.string().email({ message: "Geçersiz email adresi." }),
+  password: z.string().min(6, { message: "Şifre en az 6 karakter olmalı" }),
 });
 
 const signupSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  name: z.string().min(2, { message: "İsim en az 2 karakter olmalı" }),
+  email: z.string().email({ message: "Geçersiz email adresi." }),
+  password: z.string().min(6, { message: "Şifre en az 6 karakter olmalı" }),
 });
 
 export default function AuthPage() {
@@ -58,11 +58,11 @@ export default function AuthPage() {
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     try {
       await signIn(values.email, values.password);
-      toast({ title: "Login Successful", description: "Welcome back!" });
+      toast({ title: "Giriş Başarılı", description: "Hoşgeldin!" });
       // The useEffect will handle the redirect once user and role are loaded
     } catch (error: any) {
       toast({
-        title: "Login Failed",
+        title: "Giriş Başarısız",
         description: error.message,
         variant: "destructive",
       });
@@ -72,11 +72,11 @@ export default function AuthPage() {
   const handleSignup = async (values: z.infer<typeof signupSchema>) => {
     try {
       await signUp(values.email, values.password, values.name);
-      toast({ title: "Signup Successful", description: "Your account has been created." });
+      toast({ title: "Kayıt başarılı", description: "Hesabın oluşturuldu." });
        // The useEffect will handle the redirect once user and role are loaded
     } catch (error: any) {
       toast({
-        title: "Signup Failed",
+        title: "Kayıt Başarısız",
         description: error.message,
         variant: "destructive",
       });
@@ -179,7 +179,7 @@ export default function AuthPage() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Sifre</FormLabel>
+                        <FormLabel>Şifre</FormLabel>
                         <FormControl>
                           <Input type="password" {...field} />
                         </FormControl>

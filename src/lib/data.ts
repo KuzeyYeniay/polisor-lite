@@ -1,3 +1,4 @@
+
 export type Lesson = {
   id: string;
   title: string;
@@ -9,7 +10,7 @@ export type Lesson = {
   calendar: { day: string; time: string; room: string }[];
 };
 
-export type NewsArticle = {
+export type New = {
   id: string;
   title: string;
   summary: string;
@@ -59,20 +60,13 @@ export const lessons: Lesson[] = [
   },
 ];
 
-export const news: NewsArticle[] = [
+export const news: New[] = [
   {
-    id: 'new-research-grant',
-    title: 'PoliTo Awarded Major Grant for Sustainable Energy Research',
-    summary: 'The Department of Energy has awarded a significant grant to a team of researchers for their innovative work on next-generation solar panels.',
-    link: '#',
-    imageId: 'news1',
-  },
-  {
-    id: 'robotics-competition-win',
-    title: 'Student Team Wins International Robotics Competition',
-    summary: 'Our student-led robotics team, "I BITE," has taken first place at the RoboWorld Championship in Geneva, showcasing their advanced autonomous vehicle.',
-    link: '#',
-    imageId: 'news2',
+    id: 'poliev',
+    title: 'PoliEv - Torino Konaklama Danışmanınız',
+    summary: 'PoliEv, öğrencilerin konaklama talepleri üzerinden birbirleriyle eşleşmelerini amaçlayan, kar amacı gütmeyen bir kuruluş',
+    link: 'https://www.instagram.com/poli.ev.torino/',
+    imageId: 'poliev',
   },
 ];
 
@@ -89,6 +83,7 @@ export type TeacherMaterial = {
   fileType: string;
   uploadDate: string;
   downloadURL?: string;
+  storagePath?: string;
 };
 
 export const teacherMaterials: TeacherMaterial[] = [
@@ -97,3 +92,5 @@ export const teacherMaterials: TeacherMaterial[] = [
     { id: '3', lesson: 'Mechanical Engineering', fileName: 'intro_slides.pptx', fileType: 'PowerPoint', uploadDate: '2023-10-02' },
     { id: '4', lesson: 'Circuit Design & Analysis', fileName: 'lab_manual.pdf', fileType: 'PDF', uploadDate: '2023-10-05' },
 ];
+
+    

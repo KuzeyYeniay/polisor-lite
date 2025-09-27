@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -15,6 +16,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -22,8 +33,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { db, storage } from '@/lib/firebase';
-import { collection, addDoc, getDocs, onSnapshot } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
@@ -36,7 +47,9 @@ const uploadSchema = z.object({
 
 export default function TeacherDashboard() {
   const [materials, setMaterials] = useState<TeacherMaterial[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [materialToDelete, setMaterialToDelete] = useState<TeacherMaterial | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const { user, role, loading: authLoading } = useAuth();
@@ -81,7 +94,8 @@ export default function TeacherDashboard() {
     if (!file) return;
 
     try {
-      const storageRef = ref(storage, `materials/${file.name}`);
+      const storagePath = `materials/${Date.now()}_${file.name}`;
+      const storageRef = ref(storage, storagePath);
       const uploadResult = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(uploadResult.ref);
 
@@ -97,18 +111,48 @@ export default function TeacherDashboard() {
         fileType: file.type || 'Unknown',
         uploadDate: new Date().toISOString().split('T')[0],
         downloadURL: downloadURL,
+        storagePath: storagePath,
       };
 
       await addDoc(collection(db, 'materials'), newMaterial);
 
       toast({ title: "Success", description: "Material uploaded successfully." });
-      setIsDialogOpen(false);
+      setIsUploadDialogOpen(false);
       form.reset();
     } catch (error) {
       console.error("Upload error:", error);
       toast({ title: "Upload Failed", description: "An error occurred while uploading the file.", variant: "destructive" });
     }
   };
+  
+  const handleDelete = async () => {
+    if (!materialToDelete) return;
+
+    try {
+      // Delete from Firestore
+      await deleteDoc(doc(db, 'materials', materialToDelete.id));
+
+      // Delete from Storage
+      if (materialToDelete.storagePath) {
+        const fileRef = ref(storage, materialToDelete.storagePath);
+        await deleteObject(fileRef);
+      }
+      
+      toast({ title: "Success", description: "Material deleted successfully." });
+    } catch (error) {
+       console.error("Delete error:", error);
+       toast({ title: "Delete Failed", description: "An error occurred while deleting the material.", variant: "destructive" });
+    } finally {
+        setMaterialToDelete(null);
+        setIsDeleteDialogOpen(false);
+    }
+  };
+  
+  const openDeleteDialog = (material: TeacherMaterial) => {
+    setMaterialToDelete(material);
+    setIsDeleteDialogOpen(true);
+  };
+
 
   if (authLoading || role !== 'teacher') {
     return (
@@ -142,7 +186,7 @@ export default function TeacherDashboard() {
           <h1 className="text-4xl font-bold tracking-tight">Teacher Dashboard</h1>
           <p className="text-muted-foreground mt-2">Manage your academic materials.</p>
         </div>
-        <Button onClick={() => setIsDialogOpen(true)}>
+        <Button onClick={() => setIsUploadDialogOpen(true)}>
           <PlusCircle className="mr-2 h-4 w-4" /> Upload Material
         </Button>
       </div>
@@ -187,11 +231,11 @@ export default function TeacherDashboard() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem disabled>
                             <Edit className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
+                          <DropdownMenuItem className="text-destructive" onClick={() => openDeleteDialog(material)}>
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete
                           </DropdownMenuItem>
@@ -206,7 +250,7 @@ export default function TeacherDashboard() {
         </CardContent>
       </Card>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Upload New Material</DialogTitle>
@@ -258,6 +302,26 @@ export default function TeacherDashboard() {
           </Form>
         </DialogContent>
       </Dialog>
+      
+       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the material
+                <span className="font-bold"> {materialToDelete?.fileName}</span> and remove the file from storage.
+            </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+                Delete
+            </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
     </div>
   );
 }
+
+    

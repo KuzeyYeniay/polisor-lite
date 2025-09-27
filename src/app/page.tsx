@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ArrowRight, BookOpen } from 'lucide-react';
-import { lessons } from '@/lib/data';
+import { lessons} from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Chatbot } from '@/components/chatbot';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -58,7 +58,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tight">Derslerimiz</h2>
             <p className="text-muted-foreground mt-2">Her biri alanında başarılı öğrenciler tarafından yönetilen çeşitli kurslarımızı keşfedin.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mx-5">
             {lessons.slice(0, 3).map((lesson) => {
               const lessonImage = PlaceHolderImages.find(p => p.id === lesson.imageId);
               return (
@@ -96,7 +96,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tight">Eğitmenlerimiz</h2>
             <p className="text-muted-foreground mt-2">Sizi başarıya ulaştıracak eğitmenlerimizle tanışın.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {teachers.map((teacher) => {
                 const teacherImage = PlaceHolderImages.find(p => p.id === teacher.imageId);
                 return (
@@ -122,19 +122,7 @@ export default function Home() {
         </section>
 
         {/* Collabration Section */}
-        <section className="py-12">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold tracking-tight">Ekibimize Katılın</h2>
-            <p className="text-muted-foreground mt-2">PoliSor gelişime ve değişime açık, bu yüzden her zaman tutkulu eğitimciler arıyoruz. Potansiyel bir iş birliği için, sizden haber almak isteriz.</p>
-          </div>
-           <div className="text-center pt-8">
-                <Link href="/contact">
-                    <Button variant="link" className="text-primary">
-                        Bize Ulaşın<ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                </Link>
-            </div>
-        </section>
+
       </div>
       <Chatbot />
     </>

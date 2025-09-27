@@ -127,13 +127,13 @@ export default function StudentLessonPortal() {
           <BookOpen className="w-8 h-8 text-primary"/>
           {lesson.title}
         </h1>
-        <p className="text-muted-foreground mt-2">Welcome to your private portal for this lesson.</p>
+        <p className="text-muted-foreground mt-2">Bu dersin özel paneline hoşgeldin</p>
       </div>
 
        <Card>
         <CardHeader>
-          <CardTitle>Image Gallery</CardTitle>
-          <CardDescription>Select an image to view it.</CardDescription>
+          <CardTitle>Kaynaklar</CardTitle>
+          <CardDescription>Görüntülemek için bir kaynak seç</CardDescription>
         </CardHeader>
         <CardContent>
             {imageMaterials.length > 0 ? (
