@@ -6,6 +6,7 @@ export type Lesson = {
   description_long: string;
   teacher: string;
   teacherImageId: string;
+  teacher_description: string;
   imageId: string;
   calendar: { day: string; time: string; room: string }[];
 };
@@ -23,9 +24,10 @@ export const lessons: Lesson[] = [
     id: 'computer-sciences',
     title: 'Computer Sciences',
     description: 'Algoritmalar, veri yapıları ve algoritmik düşünme ilkeleri dünyasını keşfedin.',
-    description_long: '   Kuzey, Politecnico di Torino \'da Bilgisayar Mühendisliği öğrencisi ve bilgisayar bilimine son derece ilgilidir. Akranlarının başarılı olmasına yardımcı olma konusunda tutkuludur. Kendisi Computer Sciences dersinde sizlerle her hafta, okulun müfredatıyla bire bir uyumlu sınavlara sizleri kusursuz hazırlayacak olan kaynaklarını paylaşacak, cumartesi günleri ise bu kaynakların soru çözüm saatini düzenliyor olacak.',
+    description_long: '   Kuzey, Politecnico di Torino\'da Bilgisayar Mühendisliği öğrencisi ve bilgisayar bilimine son derece ilgilidir. Akranlarının başarılı olmasına yardımcı olma konusunda tutkuludur. Kendisi Computer Sciences dersinde sizlerle her hafta, okulun müfredatıyla bire bir uyumlu sınavlara sizleri kusursuz hazırlayacak olan kaynaklarını paylaşacak, cumartesi günleri ise bu kaynakların soru çözüm saatini düzenliyor olacak.',
     teacher: 'Kuzey',
     teacherImageId: 'teacher1',
+    teacher_description: ' Kuzey, Politecnico di Torino\'da Bilgisayar Mühendisliği öğrencisi ve bilgisayar bilimine son derece ilgilidir. Akranlarının başarılı olmasına yardımcı olma konusunda tutkuludur.',
     imageId: 'lesson1',
     calendar: [
       { day: 'Pazartesi', time: '12:00', room: 'Haftalık Kaynak Paylaşımı' },
@@ -39,6 +41,7 @@ export const lessons: Lesson[] = [
     description_long: '   Kaan, Politecnico di Torino\'da Bilgisayar Mühendisliği öğrencisi ve matematik konseptlerinde etkili öğretim yöntemleriyle tanınır. Karmaşık kavramları kolayca anlaşılır hale getirir. Kendisi Mathematical Analysis-I dersinde sizlerle her hafta, okulun müfredatıyla bire bir uyumlu sınavlara sizleri kusursuz hazırlayacak olan kaynaklarını paylaşacak, cumartesi günleri ise bu kaynakların soru çözüm saatini düzenliyor olacak.',
     teacher: 'Kaan',
     teacherImageId: 'teacher2',
+    teacher_description: 'Kaan, Politecnico di Torino\'da Bilgisayar Mühendisliği öğrencisi ve matematik konseptlerinde etkili öğretim yöntemleriyle tanınır. Karmaşık kavramları kolayca anlaşılır hale getirir.',
     imageId: 'lesson2',
     calendar: [
       { day: 'Pazartesi', time: '12:00', room: 'Haftalık Kaynak Paylaşımı' },
@@ -52,6 +55,7 @@ export const lessons: Lesson[] = [
     description_long: '   Kuzey, Politecnico di Torino \'da Bilgisayar Mühendisliği öğrencisi ve kimya sınavlarında başarılı olmanın anahtarı olacak tüyolara sahiptir. Derin bir müfredatı olan Kimya dersi için sizleri derin bir soru havuzuyla karşılayacak. Kendisi Kimya dersinde sizlerle her hafta, okulun müfredatıyla bire bir uyumlu sınavlara sizleri kusursuz hazırlayacak olan kaynaklarını paylaşacak, cumartesi günleri ise bu kaynakların soru çözüm saatini düzenliyor olacak.',
     teacher: 'Kuzey',
     teacherImageId: 'teacher1',
+    teacher_description: ' Kuzey, Politecnico di Torino \'da Bilgisayar Mühendisliği öğrencisi ve bilgisayar bilimine son derece ilgilidir. Akranlarının başarılı olmasına yardımcı olma konusunda tutkuludur.',
     imageId: 'lesson3',
     calendar: [
       { day: 'Pazartesi', time: '12:00', room: 'Haftalık Kaynak Paylaşımı' },

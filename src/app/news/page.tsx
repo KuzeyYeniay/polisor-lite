@@ -11,10 +11,11 @@ export default function InstructorsPage() {
       acc.push({
         name: lesson.teacher,
         imageId: lesson.teacherImageId,
+        description: lesson.teacher_description,
       });
     }
     return acc;
-  }, [] as { name: string; imageId: string }[]);
+  }, [] as { name: string; imageId: string; description: string}[]);
 
   return (
     <div className="container py-12">
@@ -36,7 +37,7 @@ export default function InstructorsPage() {
                     <CardTitle className="text-xl">{teacher.name}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-muted-foreground">teacher</p>
+                    <p className="text-muted-foreground">{teacher.description}</p>
                 </CardContent>
             </Card>
           );

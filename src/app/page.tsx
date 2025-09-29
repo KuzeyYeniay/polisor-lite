@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function Home() {
   const heroImage = PlaceHolderImages.find(p => p.id === 'hero');
+  const heroImage2 = PlaceHolderImages.find(p => p.id === 'hero2');
 
   // Create a unique list of teachers
   const teachers = lessons.reduce((acc, lesson) => {
@@ -25,6 +26,7 @@ export default function Home() {
   return (
     <>
       <div className="container">
+
         {/* Hero Section */}
         <section className="relative w-full h-[60vh] md:h-[70vh] rounded-lg overflow-hidden my-8">
           {heroImage && (
@@ -38,7 +40,7 @@ export default function Home() {
             />
           )}
           <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center p-4">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
+            <h1 className="text-4xl md:text-6xl font-bold text-orange-500 mb-4 drop-shadow-lg">
               PoliSor
             </h1>
             <p className="text-lg md:text-xl text-white/90 max-w-2xl mb-8 drop-shadow-md">
@@ -121,8 +123,26 @@ export default function Home() {
             </div>
         </section>
 
-        {/* Collabration Section */}
-
+        {/* PoliEv Section */}
+        <section className="relative w-full h-[60vh] md:h-[70vh] rounded-lg overflow-hidden my-8">
+          {heroImage2 && (
+            <Image
+              src={heroImage2.imageUrl}
+              alt={heroImage2.description}
+              fill
+              className="object-cover"
+              data-ai-hint={heroImage2.imageHint}
+              priority
+            />
+          )}
+          <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center p-4">
+            <Link href="https://www.instagram.com/poli.ev.torino/">
+              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                PoliEv'e Göz at <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
+        </section>
       </div>
       <Chatbot />
     </>
