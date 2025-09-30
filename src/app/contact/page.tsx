@@ -1,3 +1,4 @@
+
 import { contactInfo } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Phone, Mail, MapPin, Instagram } from 'lucide-react';
@@ -29,7 +30,7 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="container py-12 md:py-24 bg-gray-100">
+    <div className="container py-12 md:py-24 bg-gray-100 animate-fade-in">
       <div className="text-center">
         <h1 className="text-4xl font-bold tracking-tight">İletişime Geçin</h1>
         <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">

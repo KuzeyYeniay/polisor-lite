@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +9,7 @@ import { BookOpen } from 'lucide-react';
 
 export default function LessonsPage() {
   return (
-    <div className="container py-12 bg-gray-100">
+    <div className="container py-12 bg-gray-100 animate-fade-in">
       <div className="text-center mb-10">
         <h1 className="text-4xl font-bold tracking-tight">Derslerimiz</h1>
         <p className="text-muted-foreground mt-2">Sizi sınavlara eksiksiz hazırlayan kurslarımızı keşfedin.</p>

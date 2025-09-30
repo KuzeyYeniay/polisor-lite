@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { lessons } from '@/lib/data';
@@ -18,7 +19,7 @@ export default function InstructorsPage() {
   }, [] as { name: string; imageId: string; description: string}[]);
 
   return (
-    <div className="container py-12 bg-gray-100">
+    <div className="container py-12 bg-gray-100 animate-fade-in">
       <div className="text-center mb-10">
         <h1 className="text-4xl font-bold tracking-tight">Eğitmenlerimiz</h1>
         <p className="text-muted-foreground mt-2">Sizi başarıya ulaştıracak uzman ve deneyimli eğitmen kadromuzla tanışın.</p>
