@@ -123,7 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     try {
       await firebaseSignOut(auth);
-      toast({ title: "Signed Out", description: "You have been successfully signed out." });
+      toast({ title: "Çıkış Başarılı", description: "Başarıyla çıkış yaptın" });
     } catch (error) {
        console.error("Sign out error:", error);
        toast({ title: "Sign Out Failed", description: "There was an error signing out.", variant: "destructive" });
