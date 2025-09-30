@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -11,10 +12,11 @@ import type { TeacherMaterial } from '@/lib/data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Download, FileText, AlertTriangle, BookOpen, BrainCircuit, Image as ImageIcon } from 'lucide-react';
+import { Download, FileText, AlertTriangle, BookOpen, BrainCircuit, Folder, File } from 'lucide-react';
 import Link from 'next/link';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 export default function StudentLessonPortal() {
   const params = useParams();
@@ -46,7 +48,7 @@ export default function StudentLessonPortal() {
 
     const q = query(collection(db, "materials"), where("lesson", "==", lesson.title));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const materialsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TeacherMaterial));
+      const materialsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TeacherMaterial)).sort((a, b) => (a.order || 0) - (b.order || 0));
       setMaterials(materialsData);
       
       const firstImage = materialsData.find(m => m.fileType.startsWith('image/'));
@@ -63,6 +65,20 @@ export default function StudentLessonPortal() {
 
   const imageMaterials = materials.filter(m => m.fileType.startsWith('image/') || m.fileType.startsWith('application/pdf'));
   const otherMaterials = materials.filter(m => !m.fileType.startsWith('image/') && !m.fileType.startsWith('application/pdf'));
+
+  const groupMaterials = (materialList: TeacherMaterial[]) => {
+    return materialList.reduce((acc, material) => {
+      const key = material.folder || 'Uncategorized';
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(material);
+      return acc;
+    }, {} as Record<string, TeacherMaterial[]>);
+  }
+
+  const groupedImageMaterials = groupMaterials(imageMaterials);
+  const groupedOtherMaterials = groupMaterials(otherMaterials);
 
   if (authLoading || (isLoading && isEnrolled)) {
     return (
@@ -140,14 +156,28 @@ export default function StudentLessonPortal() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div className="md:col-span-1">
                         <ScrollArea className="h-[40rem] pr-4">
-                            <div className="space-y-2">
-                            {imageMaterials.map(material => (
-                                <button key={material.id} onClick={() => setSelectedImage(material)} className={cn("w-full text-left p-3 rounded-lg border transition-colors flex items-center gap-3", selectedImage?.id === material.id ? "bg-muted border-primary" : "hover:bg-muted/50")}>
-                                    <ImageIcon className="h-5 w-5 text-primary"/>
-                                    <span className="flex-1 truncate">{material.fileName}</span>
-                                </button>
-                            ))}
-                            </div>
+                            <Accordion type="multiple" defaultValue={Object.keys(groupedImageMaterials)} className="w-full">
+                                {Object.entries(groupedImageMaterials).map(([folderName, folderMaterials]) => (
+                                    <AccordionItem value={folderName} key={folderName}>
+                                        <AccordionTrigger className="text-base font-medium hover:no-underline">
+                                            <div className="flex items-center gap-2">
+                                                {folderName !== 'Uncategorized' && <Folder className="h-5 w-5 text-primary" />}
+                                                {folderName}
+                                            </div>
+                                        </AccordionTrigger>
+                                        <AccordionContent>
+                                            <div className="space-y-2 pl-2">
+                                                {folderMaterials.map(material => (
+                                                    <button key={material.id} onClick={() => setSelectedImage(material)} className={cn("w-full text-left p-3 rounded-lg border transition-colors flex items-center gap-3", selectedImage?.id === material.id ? "bg-muted border-primary" : "hover:bg-muted/50")}>
+                                                        <File className="h-5 w-5 text-primary/80"/>
+                                                        <span className="flex-1 truncate">{material.displayName}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                ))}
+                            </Accordion>
                         </ScrollArea>
                     </div>
                     <div className="md:col-span-3">
@@ -160,7 +190,7 @@ export default function StudentLessonPortal() {
                                 {selectedImage.downloadURL && (
                                   <Image 
                                     src={selectedImage.downloadURL} 
-                                    alt={selectedImage.fileName} 
+                                    alt={selectedImage.displayName} 
                                     fill 
                                     style={{ objectFit: 'contain' }}
                                     className="p-4"
@@ -200,24 +230,38 @@ export default function StudentLessonPortal() {
                 <CardDescription>İndirebileceğiniz diğer materyaller</CardDescription>
             </CardHeader>
             <CardContent>
-                 <div className="space-y-2">
-                {otherMaterials.map((material) => (
-                    <div key={material.id} className="flex justify-between items-center p-3 rounded-lg border hover:bg-muted/50">
-                        <div className="flex items-center gap-3">
-                            <FileText className="h-5 w-5 text-primary"/>
-                            <div>
-                                <p className="font-medium">{material.fileName}</p>
-                                <p className="text-xs text-muted-foreground">{material.fileType}</p>
-                            </div>
+                <Accordion type="multiple" defaultValue={Object.keys(groupedOtherMaterials)} className="w-full">
+                    {Object.entries(groupedOtherMaterials).map(([folderName, folderMaterials]) => (
+                    <AccordionItem value={folderName} key={folderName}>
+                      <AccordionTrigger className="text-lg font-medium hover:no-underline">
+                        <div className="flex items-center gap-2">
+                          {folderName !== 'Uncategorized' && <Folder className="h-5 w-5 text-primary" />}
+                          {folderName}
                         </div>
-                        <Button variant="ghost" size="icon" asChild>
-                            <a href={material.downloadURL} target="_blank" rel="noopener noreferrer" aria-label={`Download ${material.fileName}`}>
-                                <Download className="h-5 w-5" />
-                            </a>
-                        </Button>
-                    </div>
-                ))}
-                </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-2 pl-4">
+                          {folderMaterials.map((material) => (
+                            <div key={material.id} className="flex justify-between items-center p-3 rounded-lg border hover:bg-muted/50">
+                                <div className="flex items-center gap-3">
+                                    <FileText className="h-5 w-5 text-primary"/>
+                                    <div>
+                                        <p className="font-medium">{material.displayName}</p>
+                                        <p className="text-xs text-muted-foreground">{material.fileName}</p>
+                                    </div>
+                                </div>
+                                <Button variant="ghost" size="icon" asChild>
+                                    <a href={material.downloadURL} target="_blank" rel="noopener noreferrer" aria-label={`Download ${material.displayName}`}>
+                                        <Download className="h-5 w-5" />
+                                    </a>
+                                </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
             </CardContent>
         </Card>
       )}
@@ -243,3 +287,5 @@ export default function StudentLessonPortal() {
     </div>
   );
 }
+
+    
