@@ -83,18 +83,19 @@ export const contactInfo = {
 export type TeacherMaterial = {
   id: string;
   lesson: string;
+  displayName: string;
+  folder: string;
   fileName: string;
   fileType: string;
   uploadDate: string;
   downloadURL?: string;
   storagePath?: string;
+  order: number;
 };
 
 export const teacherMaterials: TeacherMaterial[] = [
-    { id: '1', lesson: 'Computer Science 101', fileName: 'lecture_01.pdf', fileType: 'PDF', uploadDate: '2023-10-01' },
-    { id: '2', lesson: 'Computer Science 101', fileName: 'assignment_1.docx', fileType: 'Word Document', uploadDate: '2023-10-03' },
-    { id: '3', lesson: 'Mechanical Engineering', fileName: 'intro_slides.pptx', fileType: 'PowerPoint', uploadDate: '2023-10-02' },
-    { id: '4', lesson: 'Circuit Design & Analysis', fileName: 'lab_manual.pdf', fileType: 'PDF', uploadDate: '2023-10-05' },
+    { id: '1', lesson: 'Computer Science 101', displayName: 'Lecture 1 Slides', folder: 'Lectures', fileName: 'lecture_01.pdf', fileType: 'PDF', uploadDate: '2023-10-01', order: 0 },
+    { id: '2', lesson: 'Computer Science 101', displayName: 'Assignment 1', folder: 'Assignments', fileName: 'assignment_1.docx', fileType: 'Word Document', uploadDate: '2023-10-03', order: 1 },
+    { id: '3', lesson: 'Mechanical Engineering', displayName: 'Introduction Slides', folder: 'Lectures', fileName: 'intro_slides.pptx', fileType: 'PowerPoint', uploadDate: '2023-10-02', order: 0 },
+    { id: '4', lesson: 'Circuit Design & Analysis', displayName: 'Lab Manual', folder: '', fileName: 'lab_manual.pdf', fileType: 'PDF', uploadDate: '2023-10-05', order: 0 },
 ];
-
-    

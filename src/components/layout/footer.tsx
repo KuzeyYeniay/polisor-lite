@@ -23,11 +23,11 @@ export function Footer() {
           {/* About Section */}
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
              <Link href="/" className="flex items-center space-x-2 mb-2">
-                <Icons.logo className="h-6 w-6 text-primary" />
+                <Icons.logo className="h-6 w-6 text-primary ml-3" />
                 <span className="font-bold text-lg">PoliSor</span>
              </Link>
-            <p className="text-muted-foreground text-sm max-w-xs">
-              Akademik başarı için Politecnico di Torino öğrencileri tarafından hazırlanmış en verimli ve güncel kaynaklar.
+            <p className="text-muted-foreground text-sm max-w-xs pl-3">
+              Akademik başarı için
             </p>
           </div>
 

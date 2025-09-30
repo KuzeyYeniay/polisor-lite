@@ -25,7 +25,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="container">
+      <div className="container bg-gray-100">
 
         {/* Hero Section */}
         <section className="relative w-full h-[60vh] md:h-[70vh] rounded-lg overflow-hidden my-8">
@@ -83,7 +83,7 @@ export default function Home() {
                   <CardContent>
                     <p className="text-muted-foreground mb-4 h-12">{lesson.description}</p>
                     <Link href={`/lessons/${lesson.id}`}>
-                      <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary/10">View Details</Button>
+                      <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary/10">Detayları Görüntüle</Button>
                     </Link>
                   </CardContent>
                 </Card>

@@ -18,7 +18,7 @@ export default function LessonDetailPage({ params }: { params: { id: string } })
   return (
     <div className="container py-12">
       <div className="grid md:grid-cols-3 gap-8">
-        <div className="md:col-span-2">
+        <div className="md:col-span-2 ml-3">
             {lessonImage && (
                 <div className="relative h-64 md:h-96 w-full rounded-lg overflow-hidden mb-8">
                 <Image

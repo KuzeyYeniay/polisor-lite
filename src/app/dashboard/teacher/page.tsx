@@ -6,10 +6,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { lessons, type TeacherMaterial } from '@/lib/data';
-import { PlusCircle, MoreVertical, Trash2, Edit, AlertTriangle } from 'lucide-react';
+import { PlusCircle, MoreVertical, Trash2, Edit, AlertTriangle, Folder, File } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,22 +25,25 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { db, storage } from '@/lib/firebase';
-import { collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, onSnapshot, deleteDoc, doc, query, where, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Badge } from '@/components/ui/badge';
 
 const uploadSchema = z.object({
   lessonId: z.string().min(1, 'Please select a lesson.'),
+  displayName: z.string().min(1, 'Display name is required.'),
+  folderName: z.string().optional(),
   file: z.any().refine((files) => files?.length === 1, 'File is required.'),
 });
 
@@ -57,6 +59,12 @@ export default function TeacherDashboard() {
 
   const form = useForm<z.infer<typeof uploadSchema>>({
     resolver: zodResolver(uploadSchema),
+    defaultValues: {
+      lessonId: '',
+      displayName: '',
+      folderName: '',
+      file: undefined,
+    }
   });
 
   useEffect(() => {
@@ -73,7 +81,7 @@ export default function TeacherDashboard() {
     if (role === 'teacher') {
       setIsLoading(true);
       const unsubscribe = onSnapshot(collection(db, 'materials'), (snapshot) => {
-        const materialsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TeacherMaterial));
+        const materialsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TeacherMaterial)).sort((a, b) => (a.order || 0) - (b.order || 0));
         setMaterials(materialsData);
         setIsLoading(false);
       }, (error) => {
@@ -94,24 +102,31 @@ export default function TeacherDashboard() {
     if (!file) return;
 
     try {
-      const storagePath = `materials/${Date.now()}_${file.name}`;
-      const storageRef = ref(storage, storagePath);
-      const uploadResult = await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(uploadResult.ref);
-
       const lesson = lessons.find(l => l.id === values.lessonId);
       if (!lesson) {
         toast({ title: "Error", description: "Selected lesson not found.", variant: "destructive" });
         return;
       }
+
+      const q = query(collection(db, 'materials'), where("lesson", "==", lesson.title));
+      const querySnapshot = await getDocs(q);
+      const newOrder = querySnapshot.size;
+
+      const storagePath = `materials/${Date.now()}_${file.name}`;
+      const storageRef = ref(storage, storagePath);
+      const uploadResult = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(uploadResult.ref);
       
       const newMaterial = {
         lesson: lesson.title,
+        displayName: values.displayName,
+        folder: values.folderName || '',
         fileName: file.name,
         fileType: file.type || 'Unknown',
         uploadDate: new Date().toISOString().split('T')[0],
         downloadURL: downloadURL,
         storagePath: storagePath,
+        order: newOrder,
       };
 
       await addDoc(collection(db, 'materials'), newMaterial);
@@ -129,15 +144,11 @@ export default function TeacherDashboard() {
     if (!materialToDelete) return;
 
     try {
-      // Delete from Firestore
       await deleteDoc(doc(db, 'materials', materialToDelete.id));
-
-      // Delete from Storage
       if (materialToDelete.storagePath) {
         const fileRef = ref(storage, materialToDelete.storagePath);
         await deleteObject(fileRef);
       }
-      
       toast({ title: "Success", description: "Material deleted successfully." });
     } catch (error) {
        console.error("Delete error:", error);
@@ -152,6 +163,15 @@ export default function TeacherDashboard() {
     setMaterialToDelete(material);
     setIsDeleteDialogOpen(true);
   };
+
+  const groupedMaterials = materials.reduce((acc, material) => {
+    const key = material.folder || 'Uncategorized';
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(material);
+    return acc;
+  }, {} as Record<string, TeacherMaterial[]>);
 
 
   if (authLoading || role !== 'teacher') {
@@ -203,61 +223,73 @@ export default function TeacherDashboard() {
                 <Skeleton className="h-12 w-full" />
                 <Skeleton className="h-12 w-full" />
              </div>
+          ) : materials.length === 0 ? (
+            <div className="text-center py-10 text-muted-foreground">
+              <p>No materials uploaded yet. Click "Upload Material" to get started.</p>
+            </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>File Name</TableHead>
-                  <TableHead>Lesson</TableHead>
-                  <TableHead>File Type</TableHead>
-                  <TableHead>Upload Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {materials.map((material) => (
-                  <TableRow key={material.id}>
-                    <TableCell className="font-medium">{material.fileName}</TableCell>
-                    <TableCell>{material.lesson}</TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">{material.fileType}</Badge>
-                    </TableCell>
-                    <TableCell>{material.uploadDate}</TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem disabled>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive" onClick={() => openDeleteDialog(material)}>
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <Accordion type="multiple" defaultValue={Object.keys(groupedMaterials)} className="w-full">
+              {Object.entries(groupedMaterials).map(([folderName, folderMaterials]) => (
+                <AccordionItem value={folderName} key={folderName}>
+                  <AccordionTrigger className="text-lg font-medium hover:no-underline">
+                    <div className="flex items-center gap-2">
+                      {folderName !== 'Uncategorized' && <Folder className="h-5 w-5 text-primary" />}
+                      {folderName}
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-2 pl-4">
+                      {folderMaterials.map((material) => (
+                        <div key={material.id} className="flex justify-between items-center p-3 rounded-lg border hover:bg-muted/50 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <File className="h-5 w-5 text-primary/80" />
+                            <div>
+                              <p className="font-medium">{material.displayName}</p>
+                              <p className="text-xs text-muted-foreground">{material.lesson} - {material.fileName}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                             <Badge variant="secondary">{material.fileType}</Badge>
+                             <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem disabled>
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive" onClick={() => openDeleteDialog(material)}>
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           )}
         </CardContent>
       </Card>
 
-      <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
+      <Dialog open={isUploadDialogOpen} onOpenChange={(isOpen) => {
+        setIsUploadDialogOpen(isOpen);
+        if (!isOpen) form.reset();
+      }}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Upload New Material</DialogTitle>
-            <DialogDescription>Select a course and a file to upload.</DialogDescription>
+            <DialogDescription>Select a course and a file to upload. Add a display name and an optional folder.</DialogDescription>
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleUpload)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(handleUpload)} className="space-y-4 pt-4">
               <FormField
                 control={form.control}
                 name="lessonId"
@@ -267,7 +299,7 @@ export default function TeacherDashboard() {
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a lesson to upload to" />
+                          <SelectValue placeholder="Select a lesson" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -276,6 +308,32 @@ export default function TeacherDashboard() {
                         ))}
                       </SelectContent>
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="displayName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Display Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Week 1 Lecture Notes" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="folderName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Folder Name (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Midterm 1 Prep" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -294,6 +352,7 @@ export default function TeacherDashboard() {
                   )}
                 />
               <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsUploadDialogOpen(false)}>Cancel</Button>
                 <Button type="submit" disabled={form.formState.isSubmitting}>
                    {form.formState.isSubmitting ? "Uploading..." : "Upload"}
                 </Button>
@@ -309,7 +368,7 @@ export default function TeacherDashboard() {
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
                 This action cannot be undone. This will permanently delete the material
-                <span className="font-bold"> {materialToDelete?.fileName}</span> and remove the file from storage.
+                <span className="font-bold"> "{materialToDelete?.displayName}"</span> and remove the file from storage.
             </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -323,5 +382,3 @@ export default function TeacherDashboard() {
     </div>
   );
 }
-
-    
