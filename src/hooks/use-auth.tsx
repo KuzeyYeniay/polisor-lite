@@ -16,7 +16,7 @@ import {
   User,
 } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
 import { useToast } from "./use-toast";
 
 type UserRole = "student" | "teacher";
@@ -41,28 +41,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    let userDocUnsubscribe: () => void = () => {};
+
+    const authStateUnsubscribe = onAuthStateChanged(auth, async (user) => {
+      // Clean up previous user's snapshot listener
+      if (userDocUnsubscribe) {
+        userDocUnsubscribe();
+      }
+
       setUser(user);
       if (user) {
         const userDocRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          setEnrolledCourses(data.enrolledCourseIds || []);
-          setRole(data.role || "student");
-        } else {
-          // If the user doc doesn't exist, create it with a default role
-          await setDoc(userDocRef, { role: "student", enrolledCourseIds: [] });
-          setEnrolledCourses([]);
-          setRole("student");
-        }
+        
+        // Use onSnapshot for real-time updates
+        userDocUnsubscribe = onSnapshot(userDocRef, async (userDoc) => {
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            setEnrolledCourses(data.enrolledCourseIds || []);
+            setRole(data.role || "student");
+          } else {
+            // If the user doc doesn't exist, create it with a default role
+            await setDoc(userDocRef, { role: "student", enrolledCourseIds: [] });
+            setEnrolledCourses([]);
+            setRole("student");
+          }
+           setLoading(false);
+        }, (error) => {
+            console.error("Error listening to user document:", error);
+            setLoading(false);
+        });
+
       } else {
         setEnrolledCourses([]);
         setRole(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
-    return () => unsubscribe();
+
+    return () => {
+      authStateUnsubscribe();
+      // Ensure the document listener is also cleaned up
+      if (userDocUnsubscribe) {
+        userDocUnsubscribe();
+      }
+    };
   }, []);
 
   const signUp = async (email: string, password: string, displayName: string) => {
