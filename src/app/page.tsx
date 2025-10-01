@@ -25,7 +25,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="container bg-gray-100">
+      <div className="container bg-gray-100 animate-fade-in">
 
         {/* Hero Section */}
         <section className="relative w-full h-[60vh] md:h-[70vh] rounded-lg overflow-hidden my-8">

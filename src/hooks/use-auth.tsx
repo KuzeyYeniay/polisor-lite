@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setRole(data.role || "student");
           } else {
             // If the user doc doesn't exist, create it with a default role
-            await setDoc(userDocRef, { role: "student", enrolledCourseIds: [] });
+            await setDoc(userDocRef, { role: "student", enrolledCourseIds: [], displayName: user.displayName });
             setEnrolledCourses([]);
             setRole("student");
           }
@@ -94,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await updateProfile(userCredential.user, { displayName });
       // Create user document in Firestore
       const userDocRef = doc(db, "users", userCredential.user.uid);
-      await setDoc(userDocRef, { role: "student", enrolledCourseIds: [] });
+      await setDoc(userDocRef, { displayName: displayName, role: "student", enrolledCourseIds: [] });
       
       setUser({ ...userCredential.user, displayName });
       setRole("student");

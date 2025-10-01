@@ -138,7 +138,7 @@ export default function StudentLessonPortal() {
 
   return (
     <div className="container py-12">
-       <div className="mb-10">
+       <div className="mb-10 mx-2">
         <h1 className="text-4xl font-bold tracking-tight flex items-center gap-3">
           <BookOpen className="w-8 h-8 text-primary"/>
           {lesson.title}

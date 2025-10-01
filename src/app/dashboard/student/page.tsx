@@ -38,11 +38,11 @@ export default function StudentDashboard() {
 
   return (
     <div className="container py-12">
-      <div className="mb-10">
+      <div className="mb-10 mx-2">
         <h1 className="text-4xl font-bold tracking-tight">Öğrenci Paneli</h1>
         <p className="text-muted-foreground mt-2">Derslerin, materyallerin, ve gelişimin.</p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mx-5">
         {lessons.map((lesson) => {
           const isUnlocked = enrolledCourses.includes(lesson.id);
           const buttonLink = isUnlocked ? `/dashboard/student/lessons/${lesson.id}` : `/lessons/${lesson.id}`;
@@ -78,26 +78,17 @@ export default function StudentDashboard() {
                       <div className="flex justify-between items-center p-2 rounded-md hover:bg-muted">
                           <div className="flex items-center gap-2">
                               <FileText className="h-4 w-4 text-primary"/>
-                              <span className="text-sm">Lecture_01.pdf</span>
+                              <span className="text-sm">PoliSor - Kullanıcı Sözleşmesi</span>
                           </div>
                           <Button variant="ghost" size="icon" asChild>
-                            <Link href="#" aria-label="Download material"><Download className="h-4 w-4"/></Link>
-                          </Button>
-                      </div>
-                      <div className="flex justify-between items-center p-2 rounded-md hover:bg-muted">
-                           <div className="flex items-center gap-2">
-                              <FileText className="h-4 w-4 text-primary"/>
-                              <span className="text-sm">Assignment_1.docx</span>
-                          </div>
-                           <Button variant="ghost" size="icon" asChild>
-                            <Link href="#" aria-label="Download material"><Download className="h-4 w-4"/></Link>
+                            <Link href="https://firebasestorage.googleapis.com/v0/b/studio-5751693164-b0fd0.firebasestorage.app/o/materials%2FPoliSor%20-%20Kullan%C4%B1c%C4%B1%20S%C3%B6zle%C5%9Fmesi.pdf?alt=media&token=54f684f1-22c7-45aa-89ed-6c5d77986e1c" aria-label="Download material"><Download className="h-4 w-4"/></Link>
                           </Button>
                       </div>
                   </div>
                 )}
                  <Link href={buttonLink} className="w-full">
                     <Button variant="outline" className="w-full mt-4">
-                      {isUnlocked ? 'Go to Lesson Portal' : 'View Public Page'}
+                      {isUnlocked ? 'Ders Paneline Eriş' : 'Detayları Görüntüle'}
                     </Button>
                  </Link>
               </CardContent>
