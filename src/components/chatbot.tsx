@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, Send, Bot, User } from "lucide-react";
+import { MessageCircle, Send, Bot, User, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -23,6 +23,7 @@ type Message = {
 
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isHintOpen, setIsHintOpen] = useState(true);
   const [messages, setMessages] = useState<Message[]>([
     {
       sender: "PoliBot",
@@ -32,6 +33,12 @@ export function Chatbot() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsHintOpen(false);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -85,13 +92,24 @@ export function Chatbot() {
 
   return (
     <>
-      <Button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 h-16 w-16 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 animate-in fade-in zoom-in duration-500"
-        aria-label="Open chatbot"
-      >
-        <MessageCircle className="h-8 w-8" />
-      </Button>
+      <div className="fixed bottom-6 right-6 flex flex-col items-end gap-2 z-40">
+        {isHintOpen && !isOpen && (
+           <div className="bg-background border border-border rounded-lg shadow-lg p-3 flex items-center gap-2 animate-in fade-in zoom-in-95">
+             <p className="text-sm font-medium text-foreground">PoliBot'a danış!</p>
+             <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); setIsHintOpen(false); }}>
+               <X className="h-4 w-4" />
+             </Button>
+           </div>
+        )}
+        <Button
+          onClick={() => setIsOpen(true)}
+          className="h-16 w-16 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 animate-in fade-in zoom-in duration-500"
+          aria-label="Open chatbot"
+        >
+          <MessageCircle className="h-8 w-8" />
+        </Button>
+      </div>
+
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent className="flex flex-col">
           <SheetHeader>
